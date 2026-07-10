@@ -1,22 +1,25 @@
 {% extends "base.html" %}
-{% block title %}Início – Igreja Batista Nova Vida Rio Pardo/RS{% endblock %}
+{% block title %}Início – IBINOVI Rio Pardo/RS{% endblock %}
 
 {% block content %}
 <!-- Hero -->
-<section class="relative bg-blue-900 text-white py-24 px-4 text-center overflow-hidden">
-    <div class="absolute inset-0 bg-gradient-to-br from-blue-900 via-blue-800 to-blue-950 opacity-95"></div>
+<section class="relative text-white py-32 px-4 text-center overflow-hidden" style="min-height:520px">
+    <div class="absolute inset-0" style="background-image:url('/static/img/hero.jpg');background-size:cover;background-position:center"></div>
+    <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(26,10,10,0.88) 0%,rgba(74,15,15,0.80) 50%,rgba(139,26,26,0.70) 100%)"></div>
     <div class="relative max-w-3xl mx-auto">
-        <p class="text-yellow-400 uppercase tracking-widest text-sm mb-3">Bem-vindo à</p>
-        <h1 class="text-4xl md:text-5xl font-bold mb-4 leading-tight">Igreja Batista Nova Vida</h1>
-        <p class="text-blue-200 text-lg mb-8">Rio Pardo – Rio Grande do Sul</p>
-        <p class="text-lg text-blue-100 mb-8 max-w-xl mx-auto">
+        <p class="uppercase tracking-widest text-xs mb-4" style="color:#f0c0c0;letter-spacing:0.3em">Bem-vindo à</p>
+        <h1 class="font-bold mb-3 leading-tight" style="font-family:'Cormorant Garamond',serif;font-size:3.2rem">Igreja Batista Independente Nova Vida</h1>
+        <p class="text-2xl font-light mb-2" style="font-family:'Cormorant Garamond',serif;color:#f0c0c0;letter-spacing:0.2em">IBINOVI</p>
+        <p class="text-sm mb-2" style="color:#d4b0b0;letter-spacing:0.1em">RIO PARDO – RIO GRANDE DO SUL</p>
+        <div class="my-6" style="width:60px;height:2px;background:#8B1A1A;margin:1.5rem auto"></div>
+        <p class="text-base mb-10 max-w-xl mx-auto" style="color:#e8d0d0">
             Um lugar de fé, comunhão e esperança. Você é muito bem-vindo!
         </p>
         <div class="flex flex-wrap justify-center gap-4">
-            <a href="/cultos" class="bg-yellow-500 hover:bg-yellow-400 text-blue-900 font-bold px-6 py-3 rounded-lg transition">
+            <a href="/cultos" class="font-semibold px-8 py-3 text-sm uppercase tracking-widest transition" style="background:#8B1A1A;color:white;letter-spacing:0.15em" onmouseover="this.style.background='#6e1414'" onmouseout="this.style.background='#8B1A1A'">
                 Nossos Cultos
             </a>
-            <a href="/sobre" class="border border-white hover:bg-white hover:text-blue-900 text-white font-bold px-6 py-3 rounded-lg transition">
+            <a href="/sobre" class="font-semibold px-8 py-3 text-sm uppercase tracking-widest transition" style="border:1px solid rgba(255,255,255,0.6);color:white" onmouseover="this.style.background='rgba(255,255,255,0.15)'" onmouseout="this.style.background='transparent'">
                 Conheça-nos
             </a>
         </div>
@@ -25,49 +28,56 @@
 
 <!-- Cards de destaques -->
 <section class="max-w-6xl mx-auto px-4 py-16 grid grid-cols-1 md:grid-cols-3 gap-8">
-    <div class="bg-white rounded-xl shadow p-8 text-center hover:shadow-md transition">
+    <div class="bg-white shadow p-8 text-center hover:shadow-lg transition" style="border-top:3px solid #8B1A1A">
         <div class="text-4xl mb-4">🙏</div>
-        <h3 class="text-xl font-bold text-blue-900 mb-2">Cultos Semanais</h3>
+        <h3 class="text-xl font-bold mb-2" style="font-family:'Cormorant Garamond',serif;color:#8B1A1A">Cultos Semanais</h3>
         <p class="text-gray-600 text-sm">Pregação da Palavra de Deus todos os domingos e durante a semana.</p>
-        <a href="/cultos" class="mt-4 inline-block text-blue-700 hover:underline text-sm font-medium">Ver horários →</a>
+        <a href="/cultos" class="mt-4 inline-block text-sm font-medium hover:underline" style="color:#8B1A1A">Ver horários →</a>
     </div>
-    <div class="bg-white rounded-xl shadow p-8 text-center hover:shadow-md transition">
+    <div class="bg-white shadow p-8 text-center hover:shadow-lg transition" style="border-top:3px solid #8B1A1A">
         <div class="text-4xl mb-4">🤝</div>
-        <h3 class="text-xl font-bold text-blue-900 mb-2">Comunidade</h3>
+        <h3 class="text-xl font-bold mb-2" style="font-family:'Cormorant Garamond',serif;color:#8B1A1A">Comunidade</h3>
         <p class="text-gray-600 text-sm">Uma família unida em amor, fé e serviço ao próximo.</p>
-        <a href="/sobre" class="mt-4 inline-block text-blue-700 hover:underline text-sm font-medium">Saiba mais →</a>
+        <a href="/sobre" class="mt-4 inline-block text-sm font-medium hover:underline" style="color:#8B1A1A">Saiba mais →</a>
     </div>
-    <div class="bg-white rounded-xl shadow p-8 text-center hover:shadow-md transition">
+    <div class="bg-white shadow p-8 text-center hover:shadow-lg transition" style="border-top:3px solid #8B1A1A">
         <div class="text-4xl mb-4">📅</div>
-        <h3 class="text-xl font-bold text-blue-900 mb-2">Eventos</h3>
+        <h3 class="text-xl font-bold mb-2" style="font-family:'Cormorant Garamond',serif;color:#8B1A1A">Eventos</h3>
         <p class="text-gray-600 text-sm">Confraternizações, conferências e eventos especiais ao longo do ano.</p>
-        <a href="/eventos" class="mt-4 inline-block text-blue-700 hover:underline text-sm font-medium">Ver eventos →</a>
+        <a href="/eventos" class="mt-4 inline-block text-sm font-medium hover:underline" style="color:#8B1A1A">Ver eventos →</a>
     </div>
 </section>
 
 <!-- Versículo -->
-<section class="bg-blue-50 py-12 px-4 text-center">
+<section class="py-16 px-4 text-center" style="background-color:#1a0a0a">
     <div class="max-w-2xl mx-auto">
-        <p class="text-2xl text-blue-900 italic mb-3" style="font-family:'Playfair Display',serif">
+        <div class="mb-5" style="width:40px;height:2px;background:#8B1A1A;margin:0 auto"></div>
+        <p class="italic mb-5" style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:#e8d0d0;line-height:1.7">
             "Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito, para que todo aquele que nele crê não pereça, mas tenha a vida eterna."
         </p>
-        <p class="text-blue-600 font-semibold text-sm">João 3:16</p>
+        <p class="text-sm uppercase tracking-widest" style="color:#8B1A1A">João 3:16</p>
+        <div class="mt-5" style="width:40px;height:2px;background:#8B1A1A;margin:0 auto"></div>
     </div>
 </section>
 
 <!-- Como chegar -->
 <section class="max-w-6xl mx-auto px-4 py-16">
-    <h2 class="text-3xl font-bold text-blue-900 text-center mb-8">Como Chegar</h2>
-    <div class="bg-white rounded-xl shadow p-8 flex flex-col md:flex-row gap-8 items-center">
+    <h2 class="text-3xl font-bold text-center mb-8" style="font-family:'Cormorant Garamond',serif;color:#8B1A1A">Como Chegar</h2>
+    <div class="bg-white shadow p-8 flex flex-col md:flex-row gap-8 items-center">
         <div class="flex-1">
-            <p class="text-gray-600 mb-2"><strong>Endereço:</strong> Rio Pardo – RS</p>
-            <p class="text-gray-600 mb-4">Venha nos visitar. Você é muito bem-vindo!</p>
-            <a href="/contato" class="inline-block bg-blue-900 text-white px-5 py-2 rounded-lg hover:bg-blue-800 transition text-sm font-medium">
+            <p class="text-gray-600 mb-1"><strong>Endereço:</strong> Rua Nicolau Matte Pessoa de Brum, 158</p>
+            <p class="text-gray-600 mb-1">Bairro Higino Leitão – Rio Pardo/RS</p>
+            <p class="text-gray-600 mb-4"><strong>WhatsApp:</strong> (51) 99726-7850</p>
+            <a href="/contato" class="inline-block text-white px-6 py-2 text-sm font-medium uppercase tracking-widest transition" style="background:#8B1A1A" onmouseover="this.style.background='#6e1414'" onmouseout="this.style.background='#8B1A1A'">
                 Fale conosco
             </a>
         </div>
-        <div class="flex-1 w-full h-48 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 text-sm">
-            Mapa em breve
+        <div class="flex-1 w-full h-56 rounded-lg overflow-hidden">
+            <iframe
+                src="https://www.google.com/maps?q=Rua+Nicolau+Matte+Pessoa+de+Brum,+158,+Rio+Pardo,+RS&output=embed"
+                width="100%" height="100%" style="border:0;" allowfullscreen loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
         </div>
     </div>
 </section>
