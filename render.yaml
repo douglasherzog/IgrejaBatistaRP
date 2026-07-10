@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: ibinovi-site
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        value: sqlite:///./igreja.db
+      - key: SECRET_KEY
+        generateValue: true
+      - key: TOTP_ISSUER
+        value: IgrejaBatistaNovaVida
