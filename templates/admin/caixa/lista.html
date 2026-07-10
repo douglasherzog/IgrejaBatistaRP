@@ -52,6 +52,7 @@
                 <th class="px-4 py-3">Tipo</th>
                 <th class="px-4 py-3">Categoria</th>
                 <th class="px-4 py-3">Descrição</th>
+                <th class="px-4 py-3">Dizimista</th>
                 <th class="px-4 py-3 text-right">Valor</th>
                 <th class="px-4 py-3 text-right">Ações</th>
             </tr>
@@ -69,6 +70,13 @@
                 </td>
                 <td class="px-4 py-3 text-gray-600">{{ l.categoria }}</td>
                 <td class="px-4 py-3 text-gray-700">{{ l.descricao }}</td>
+                <td class="px-4 py-3 text-gray-600 text-sm">
+                    {% if l.categoria == 'Dízimo' and l.membro %}
+                    {{ l.membro.nome }} {{ l.membro.sobrenome }}
+                    {% elif l.categoria == 'Dízimo' %}
+                    <span class="text-red-400 text-xs">Não informado</span>
+                    {% endif %}
+                </td>
                 <td class="px-4 py-3 text-right font-medium {% if l.tipo.value == 'receita' %}text-green-700{% else %}text-red-700{% endif %}">
                     R$ {{ "%.2f"|format(l.valor) }}
                 </td>
@@ -82,7 +90,7 @@
             </tr>
             {% else %}
             <tr>
-                <td colspan="6" class="text-center text-gray-400 py-8">Nenhum lançamento neste período.</td>
+                <td colspan="7" class="text-center text-gray-400 py-8">Nenhum lançamento neste período.</td>
             </tr>
             {% endfor %}
         </tbody>

@@ -52,6 +52,18 @@
                 value="{{ lancamento.data.isoformat() if lancamento else '' }}"
                 class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
+        <div id="campo-dizimista" style="display:none">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Dizimista (Membro) *</label>
+            <select name="membro_id" id="membro_id"
+                class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">— Selecione o membro —</option>
+                {% for m in membros %}
+                <option value="{{ m.id }}" {% if lancamento and lancamento.membro_id == m.id %}selected{% endif %}>
+                    {{ m.nome }} {{ m.sobrenome }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Observações</label>
             <textarea name="observacoes" rows="3"
@@ -80,7 +92,24 @@ function atualizarCategorias() {
     });
     const visivel = [...opts].find(o => o.dataset.tipo === tipo);
     if (visivel) sel.value = visivel.value;
+    atualizarDizimista();
 }
+
+function atualizarDizimista() {
+    const cat = document.getElementById('categoria').value;
+    const campo = document.getElementById('campo-dizimista');
+    const sel = document.getElementById('membro_id');
+    if (cat === 'Dízimo') {
+        campo.style.display = '';
+        sel.required = true;
+    } else {
+        campo.style.display = 'none';
+        sel.required = false;
+        sel.value = '';
+    }
+}
+
+document.getElementById('categoria').addEventListener('change', atualizarDizimista);
 atualizarCategorias();
 </script>
 {% endblock %}

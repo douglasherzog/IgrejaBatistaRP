@@ -6,7 +6,7 @@ from sqlalchemy import func, extract
 from datetime import date
 from decimal import Decimal
 from app.database import get_db
-from app.models import Lancamento, TipoLancamento, Admin
+from app.models import Lancamento, TipoLancamento, Admin, Membro
 from app.auth import get_admin_atual
 
 router = APIRouter()
@@ -55,14 +55,17 @@ def listar_lancamentos(
 def novo_lancamento_page(
     request: Request,
     tipo: str = "receita",
+    db: Session = Depends(get_db),
     admin: Admin = Depends(get_admin_atual)
 ):
+    membros = db.query(Membro).filter(Membro.ativo == True).order_by(Membro.nome).all()
     return templates.TemplateResponse("admin/caixa/form.html", {
         "request": request,
         "lancamento": None,
         "tipo_pre": tipo,
         "categorias_receita": CATEGORIAS_RECEITA,
         "categorias_despesa": CATEGORIAS_DESPESA,
+        "membros": membros,
     })
 
 
@@ -74,6 +77,7 @@ def criar_lancamento(
     valor: str = Form(...),
     data: str = Form(...),
     observacoes: str = Form(default=""),
+    membro_id: str = Form(default=""),
     db: Session = Depends(get_db),
     admin: Admin = Depends(get_admin_atual)
 ):
@@ -84,6 +88,7 @@ def criar_lancamento(
         valor=Decimal(valor.replace(",", ".")),
         data=date.fromisoformat(data),
         observacoes=observacoes or None,
+        membro_id=int(membro_id) if membro_id else None,
     )
     db.add(lancamento)
     db.commit()
@@ -100,12 +105,14 @@ def editar_lancamento_page(
     lancamento = db.query(Lancamento).filter(Lancamento.id == id).first()
     if not lancamento:
         raise HTTPException(status_code=404)
+    membros = db.query(Membro).filter(Membro.ativo == True).order_by(Membro.nome).all()
     return templates.TemplateResponse("admin/caixa/form.html", {
         "request": request,
         "lancamento": lancamento,
         "tipo_pre": lancamento.tipo.value,
         "categorias_receita": CATEGORIAS_RECEITA,
         "categorias_despesa": CATEGORIAS_DESPESA,
+        "membros": membros,
     })
 
 
@@ -118,6 +125,7 @@ def atualizar_lancamento(
     valor: str = Form(...),
     data: str = Form(...),
     observacoes: str = Form(default=""),
+    membro_id: str = Form(default=""),
     db: Session = Depends(get_db),
     admin: Admin = Depends(get_admin_atual)
 ):
@@ -130,6 +138,7 @@ def atualizar_lancamento(
     lancamento.valor = Decimal(valor.replace(",", "."))
     lancamento.data = date.fromisoformat(data)
     lancamento.observacoes = observacoes or None
+    lancamento.membro_id = int(membro_id) if membro_id else None
     db.commit()
     return RedirectResponse(url="/admin/caixa", status_code=302)
 

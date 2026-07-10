@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Date, DateTime, Numeric, Text, Boolean, Enum
+from sqlalchemy import Column, Integer, String, Date, DateTime, Numeric, Text, Boolean, Enum, ForeignKey
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 import enum
 from app.database import Base
@@ -51,4 +52,6 @@ class Lancamento(Base):
     valor = Column(Numeric(10, 2), nullable=False)
     data = Column(Date, nullable=False)
     observacoes = Column(Text, nullable=True)
+    membro_id = Column(Integer, ForeignKey("membros.id"), nullable=True)
+    membro = relationship("Membro", backref="lancamentos")
     criado_em = Column(DateTime, server_default=func.now())
