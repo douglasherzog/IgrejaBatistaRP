@@ -8,9 +8,11 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi import Depends, HTTPException, status, Cookie
 from sqlalchemy.orm import Session
+from dotenv import load_dotenv
 from app.database import get_db
 from app.models import Admin
 
+load_dotenv(override=True)
 SECRET_KEY = os.getenv("SECRET_KEY", "chave-secreta-troque-em-producao")
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_HOURS = 8
@@ -29,6 +31,8 @@ def verificar_senha(senha: str, hash: str) -> bool:
 
 def criar_token(data: dict) -> str:
     payload = data.copy()
+    if "sub" in payload:
+        payload["sub"] = str(payload["sub"])
     payload["exp"] = datetime.utcnow() + timedelta(hours=TOKEN_EXPIRE_HOURS)
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
@@ -67,7 +71,7 @@ def get_admin_atual(
     payload = verificar_token(session_token)
     if not payload:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Sessão inválida")
-    admin = db.query(Admin).filter(Admin.id == payload.get("sub")).first()
+    admin = db.query(Admin).filter(Admin.id == int(payload.get("sub"))).first()
     if not admin:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Usuário não encontrado")
     return admin

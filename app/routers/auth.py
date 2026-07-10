@@ -58,7 +58,7 @@ def totp_verificar(
     payload = auth_service.verificar_token(totp_token)
     if not payload or payload.get("etapa") != "totp":
         return RedirectResponse(url="/admin/login", status_code=302)
-    admin = db.query(Admin).filter(Admin.id == payload["sub"]).first()
+    admin = db.query(Admin).filter(Admin.id == int(payload["sub"])).first()
     if not admin or not auth_service.verificar_totp(admin.totp_secret, codigo):
         return templates.TemplateResponse(
             "admin/totp.html",
@@ -85,7 +85,7 @@ def setup_totp_page(request: Request, token: str = None, db: Session = Depends(g
     payload = auth_service.verificar_token(token)
     if not payload:
         raise HTTPException(status_code=400, detail="Token inválido ou expirado")
-    admin = db.query(Admin).filter(Admin.id == payload["sub"]).first()
+    admin = db.query(Admin).filter(Admin.id == int(payload["sub"])).first()
     if not admin:
         raise HTTPException(status_code=404)
     if not admin.totp_secret:
@@ -109,7 +109,7 @@ def setup_totp_confirmar(
     payload = auth_service.verificar_token(token)
     if not payload:
         raise HTTPException(status_code=400, detail="Token inválido")
-    admin = db.query(Admin).filter(Admin.id == payload["sub"]).first()
+    admin = db.query(Admin).filter(Admin.id == int(payload["sub"])).first()
     if not auth_service.verificar_totp(admin.totp_secret, codigo):
         qrcode_b64 = auth_service.gerar_qrcode_base64(admin.totp_secret, admin.email)
         return templates.TemplateResponse("admin/setup_totp.html", {

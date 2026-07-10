@@ -1,37 +1,66 @@
 {% extends "base.html" %}
-{% block title %}Cultos – IBINOVI Rio Pardo/RS{% endblock %}
+{% block title %}Programação – IBINOVI Rio Pardo/RS{% endblock %}
 {% block content %}
-<section class="bg-blue-900 text-white py-16 px-4 text-center">
-    <h1 class="text-4xl font-bold mb-2">Cultos e Horários</h1>
-    <p class="text-blue-200">Venha adorar a Deus conosco</p>
+<section class="py-16 px-4 text-center text-white" style="background-color:#8B1A1A">
+    <h1 class="font-bold mb-2" style="font-family:'Cormorant Garamond',serif;font-size:2.8rem">Programação Semanal</h1>
+    <p style="color:#f0c0c0">Venha adorar a Deus conosco</p>
 </section>
-<section class="max-w-4xl mx-auto px-4 py-14">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-white rounded-xl shadow p-6 border-l-4 border-yellow-500">
-            <p class="text-yellow-600 font-semibold text-sm uppercase mb-1">Domingo</p>
-            <h3 class="text-xl font-bold text-blue-900 mb-1">Culto da Manhã</h3>
-            <p class="text-gray-600 text-sm">🕙 10h00</p>
-            <p class="text-gray-500 text-sm mt-2">Culto de adoração e pregação da Palavra.</p>
+
+<section class="max-w-3xl mx-auto px-4 py-14">
+    <div class="space-y-4">
+
+        <div class="bg-white shadow flex items-center gap-6 p-6" style="border-left:4px solid #8B1A1A">
+            <div class="text-center" style="min-width:90px">
+                <p class="font-bold uppercase text-xs tracking-widest" style="color:#8B1A1A">Terça-feira</p>
+                <p class="text-2xl font-bold" style="font-family:'Cormorant Garamond',serif;color:#1a1a1a">19h30</p>
+            </div>
+            <div>
+                <h3 class="font-bold text-lg" style="font-family:'Cormorant Garamond',serif;color:#1a1a1a">Terça do Despertar</h3>
+            </div>
         </div>
-        <div class="bg-white rounded-xl shadow p-6 border-l-4 border-blue-600">
-            <p class="text-blue-600 font-semibold text-sm uppercase mb-1">Domingo</p>
-            <h3 class="text-xl font-bold text-blue-900 mb-1">Culto da Noite</h3>
-            <p class="text-gray-600 text-sm">🕖 18h30</p>
-            <p class="text-gray-500 text-sm mt-2">Culto evangelístico. Traga um amigo!</p>
+
+        <div class="bg-white shadow flex items-center gap-6 p-6" style="border-left:4px solid #8B1A1A">
+            <div class="text-center" style="min-width:90px">
+                <p class="font-bold uppercase text-xs tracking-widest" style="color:#8B1A1A">Quarta-feira</p>
+                <p class="text-2xl font-bold" style="font-family:'Cormorant Garamond',serif;color:#1a1a1a">15h00</p>
+            </div>
+            <div>
+                <h3 class="font-bold text-lg" style="font-family:'Cormorant Garamond',serif;color:#1a1a1a">Reunião de Oração</h3>
+            </div>
         </div>
-        <div class="bg-white rounded-xl shadow p-6 border-l-4 border-green-500">
-            <p class="text-green-600 font-semibold text-sm uppercase mb-1">Quarta-feira</p>
-            <h3 class="text-xl font-bold text-blue-900 mb-1">Culto de Oração</h3>
-            <p class="text-gray-600 text-sm">🕖 19h30</p>
-            <p class="text-gray-500 text-sm mt-2">Reunião de oração, estudo bíblico e comunhão.</p>
+
+        <div class="bg-white shadow flex items-center gap-6 p-6" style="border-left:4px solid #8B1A1A">
+            <div class="text-center" style="min-width:90px">
+                <p class="font-bold uppercase text-xs tracking-widest" style="color:#8B1A1A">Quinta-feira</p>
+                <p class="text-2xl font-bold" style="font-family:'Cormorant Garamond',serif;color:#1a1a1a">19h30</p>
+            </div>
+            <div>
+                <h3 class="font-bold text-lg" style="font-family:'Cormorant Garamond',serif;color:#1a1a1a">Jovens New Life</h3>
+                <p class="text-sm text-gray-500 mt-1">Na casa do Irmão Tiago Glashorester</p>
+            </div>
         </div>
-        <div class="bg-white rounded-xl shadow p-6 border-l-4 border-purple-500">
-            <p class="text-purple-600 font-semibold text-sm uppercase mb-1">Sábado</p>
-            <h3 class="text-xl font-bold text-blue-900 mb-1">Escola Bíblica</h3>
-            <p class="text-gray-600 text-sm">🕖 19h00</p>
-            <p class="text-gray-500 text-sm mt-2">Estudo aprofundado da Palavra de Deus.</p>
+
+        <div class="bg-white shadow flex items-center gap-6 p-6" style="border-left:4px solid #8B1A1A">
+            <div class="text-center" style="min-width:90px">
+                <p class="font-bold uppercase text-xs tracking-widest" style="color:#8B1A1A">Sexta-feira</p>
+                <p class="text-2xl font-bold" style="font-family:'Cormorant Garamond',serif;color:#1a1a1a">19h30</p>
+            </div>
+            <div>
+                <h3 class="font-bold text-lg" style="font-family:'Cormorant Garamond',serif;color:#1a1a1a">Reunião de Oração</h3>
+            </div>
         </div>
+
+        <div class="shadow flex items-center gap-6 p-6 text-white" style="border-left:4px solid #f0c0c0;background-color:#8B1A1A">
+            <div class="text-center" style="min-width:90px">
+                <p class="font-bold uppercase text-xs tracking-widest" style="color:#f0c0c0">Domingo</p>
+                <p class="text-2xl font-bold" style="font-family:'Cormorant Garamond',serif">19h00</p>
+            </div>
+            <div>
+                <h3 class="font-bold text-lg" style="font-family:'Cormorant Garamond',serif">Culto de Celebração</h3>
+            </div>
+        </div>
+
     </div>
-    <p class="text-center text-gray-400 text-sm mt-8">* Horários sujeitos a alterações em datas especiais.</p>
+    <p class="text-center text-gray-400 text-xs mt-8 uppercase tracking-widest">* Horários sujeitos a alterações em datas especiais.</p>
 </section>
 {% endblock %}

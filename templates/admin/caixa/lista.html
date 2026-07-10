@@ -16,8 +16,8 @@
 <!-- Navegação de mês -->
 <form method="get" class="flex gap-2 mb-6 items-center">
     <select name="mes" class="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-        {% for i, nome in enumerate(['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'], 1) %}
-        <option value="{{ i }}" {% if i == mes %}selected{% endif %}>{{ nome }}</option>
+        {% for item in [(1,'Janeiro'),(2,'Fevereiro'),(3,'Março'),(4,'Abril'),(5,'Maio'),(6,'Junho'),(7,'Julho'),(8,'Agosto'),(9,'Setembro'),(10,'Outubro'),(11,'Novembro'),(12,'Dezembro')] %}
+        <option value="{{ item[0] }}" {% if item[0] == mes %}selected{% endif %}>{{ item[1] }}</option>
         {% endfor %}
     </select>
     <input type="number" name="ano" value="{{ ano }}" min="2020" max="2099"
