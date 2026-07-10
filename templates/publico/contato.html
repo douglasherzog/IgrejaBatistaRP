@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Contato – Igreja Batista Nova Vida{% endblock %}
+{% block content %}
+<section class="bg-blue-900 text-white py-16 px-4 text-center">
+    <h1 class="text-4xl font-bold mb-2">Entre em Contato</h1>
+    <p class="text-blue-200">Estamos aqui para recebê-lo</p>
+</section>
+<section class="max-w-4xl mx-auto px-4 py-14">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="bg-white rounded-xl shadow p-8 space-y-4 text-gray-700">
+            <h2 class="text-xl font-bold text-blue-900">Informações</h2>
+            <div class="flex items-start gap-3">
+                <span class="text-2xl">📍</span>
+                <div>
+                    <p class="font-semibold">Endereço</p>
+                    <p class="text-sm text-gray-500">Rio Pardo – RS</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-3">
+                <span class="text-2xl">📞</span>
+                <div>
+                    <p class="font-semibold">Telefone</p>
+                    <p class="text-sm text-gray-500">A informar</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-3">
+                <span class="text-2xl">✉️</span>
+                <div>
+                    <p class="font-semibold">E-mail</p>
+                    <p class="text-sm text-gray-500">A informar</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-3">
+                <span class="text-2xl">🕙</span>
+                <div>
+                    <p class="font-semibold">Cultos</p>
+                    <p class="text-sm text-gray-500">Dom 10h e 18h30 | Qua 19h30</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-xl shadow p-8">
+            <h2 class="text-xl font-bold text-blue-900 mb-4">Envie uma mensagem</h2>
+            <form class="space-y-4">
+                <input type="text" placeholder="Seu nome" class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <input type="email" placeholder="Seu e-mail" class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <textarea rows="4" placeholder="Sua mensagem" class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                <button type="submit" class="w-full bg-blue-900 text-white py-2 rounded-lg hover:bg-blue-800 transition text-sm font-medium">
+                    Enviar mensagem
+                </button>
+                <p class="text-xs text-gray-400 text-center">* Funcionalidade de e-mail será configurada em breve.</p>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

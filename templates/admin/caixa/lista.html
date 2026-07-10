@@ -1,0 +1,91 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Controle de Caixa{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h1 class="text-2xl font-bold text-blue-900">Controle de Caixa</h1>
+        <p class="text-gray-500 text-sm">
+            {{ ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][mes-1] }} / {{ ano }}
+        </p>
+    </div>
+    <a href="/admin/caixa/novo" class="bg-blue-900 text-white px-5 py-2 rounded-lg hover:bg-blue-800 transition text-sm font-medium">
+        + Novo Lançamento
+    </a>
+</div>
+
+<!-- Navegação de mês -->
+<form method="get" class="flex gap-2 mb-6 items-center">
+    <select name="mes" class="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        {% for i, nome in enumerate(['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'], 1) %}
+        <option value="{{ i }}" {% if i == mes %}selected{% endif %}>{{ nome }}</option>
+        {% endfor %}
+    </select>
+    <input type="number" name="ano" value="{{ ano }}" min="2020" max="2099"
+        class="border rounded-lg px-3 py-2 text-sm w-24 focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <button class="bg-gray-100 border px-4 py-2 rounded-lg text-sm hover:bg-gray-200 transition">Filtrar</button>
+</form>
+
+<!-- Resumo -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div class="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
+        <p class="text-xs text-green-600 font-semibold uppercase">Receitas</p>
+        <p class="text-2xl font-bold text-green-700 mt-1">R$ {{ "%.2f"|format(total_receitas) }}</p>
+    </div>
+    <div class="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
+        <p class="text-xs text-red-600 font-semibold uppercase">Despesas</p>
+        <p class="text-2xl font-bold text-red-700 mt-1">R$ {{ "%.2f"|format(total_despesas) }}</p>
+    </div>
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
+        <p class="text-xs text-blue-600 font-semibold uppercase">Saldo</p>
+        <p class="text-2xl font-bold mt-1 {% if saldo >= 0 %}text-blue-800{% else %}text-red-700{% endif %}">
+            R$ {{ "%.2f"|format(saldo) }}
+        </p>
+    </div>
+</div>
+
+<!-- Tabela -->
+<div class="bg-white rounded-xl shadow overflow-hidden">
+    <table class="w-full text-sm">
+        <thead class="bg-blue-900 text-white text-left">
+            <tr>
+                <th class="px-4 py-3">Data</th>
+                <th class="px-4 py-3">Tipo</th>
+                <th class="px-4 py-3">Categoria</th>
+                <th class="px-4 py-3">Descrição</th>
+                <th class="px-4 py-3 text-right">Valor</th>
+                <th class="px-4 py-3 text-right">Ações</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+            {% for l in lancamentos %}
+            <tr class="hover:bg-gray-50">
+                <td class="px-4 py-3 text-gray-500">{{ l.data.strftime('%d/%m/%Y') }}</td>
+                <td class="px-4 py-3">
+                    {% if l.tipo.value == 'receita' %}
+                    <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-medium">Receita</span>
+                    {% else %}
+                    <span class="bg-red-100 text-red-700 px-2 py-0.5 rounded text-xs font-medium">Despesa</span>
+                    {% endif %}
+                </td>
+                <td class="px-4 py-3 text-gray-600">{{ l.categoria }}</td>
+                <td class="px-4 py-3 text-gray-700">{{ l.descricao }}</td>
+                <td class="px-4 py-3 text-right font-medium {% if l.tipo.value == 'receita' %}text-green-700{% else %}text-red-700{% endif %}">
+                    R$ {{ "%.2f"|format(l.valor) }}
+                </td>
+                <td class="px-4 py-3 text-right space-x-2">
+                    <a href="/admin/caixa/{{ l.id }}/editar" class="text-blue-600 hover:underline text-xs">Editar</a>
+                    <form method="post" action="/admin/caixa/{{ l.id }}/excluir" class="inline"
+                        onsubmit="return confirm('Excluir este lançamento?')">
+                        <button class="text-red-500 hover:underline text-xs">Excluir</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" class="text-center text-gray-400 py-8">Nenhum lançamento neste período.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

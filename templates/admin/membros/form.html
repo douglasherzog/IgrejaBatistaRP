@@ -1,0 +1,84 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}{% if membro %}Editar Membro{% else %}Novo Membro{% endif %}{% endblock %}
+{% block content %}
+<div class="mb-6">
+    <a href="/admin/membros" class="text-sm text-blue-600 hover:underline">← Voltar</a>
+    <h1 class="text-2xl font-bold text-blue-900 mt-1">
+        {% if membro %}Editar Membro{% else %}Novo Membro{% endif %}
+    </h1>
+</div>
+
+<form method="post" action="{% if membro %}/admin/membros/{{ membro.id }}/editar{% else %}/admin/membros/novo{% endif %}"
+    class="bg-white rounded-xl shadow p-8 max-w-3xl">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nome *</label>
+            <input type="text" name="nome" required value="{{ membro.nome if membro else '' }}"
+                class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Sobrenome *</label>
+            <input type="text" name="sobrenome" required value="{{ membro.sobrenome if membro else '' }}"
+                class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Data de Nascimento</label>
+            <input type="date" name="data_nascimento"
+                value="{{ membro.data_nascimento.isoformat() if membro and membro.data_nascimento else '' }}"
+                class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Data de Batismo</label>
+            <input type="date" name="data_batismo"
+                value="{{ membro.data_batismo.isoformat() if membro and membro.data_batismo else '' }}"
+                class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Telefone</label>
+            <input type="tel" name="telefone" value="{{ membro.telefone or '' if membro else '' }}"
+                class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
+            <input type="email" name="email" value="{{ membro.email or '' if membro else '' }}"
+                class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Endereço</label>
+            <input type="text" name="endereco" value="{{ membro.endereco or '' if membro else '' }}"
+                class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Bairro</label>
+            <input type="text" name="bairro" value="{{ membro.bairro or '' if membro else '' }}"
+                class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">CEP</label>
+            <input type="text" name="cep" value="{{ membro.cep or '' if membro else '' }}"
+                class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Cidade</label>
+            <input type="text" name="cidade" value="{{ membro.cidade or 'Rio Pardo' if membro else 'Rio Pardo' }}"
+                class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+            <input type="text" name="estado" maxlength="2" value="{{ membro.estado or 'RS' if membro else 'RS' }}"
+                class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Observações</label>
+            <textarea name="observacoes" rows="3"
+                class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">{{ membro.observacoes or '' if membro else '' }}</textarea>
+        </div>
+    </div>
+    <div class="flex gap-3 mt-6">
+        <button type="submit" class="bg-blue-900 text-white px-6 py-2 rounded-lg hover:bg-blue-800 transition text-sm font-medium">
+            {% if membro %}Salvar alterações{% else %}Cadastrar{% endif %}
+        </button>
+        <a href="/admin/membros" class="px-6 py-2 border rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition">Cancelar</a>
+    </div>
+</form>
+{% endblock %}

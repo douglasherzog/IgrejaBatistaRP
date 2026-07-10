@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Início – Igreja Batista Nova Vida Rio Pardo/RS{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<section class="relative bg-blue-900 text-white py-24 px-4 text-center overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-blue-900 via-blue-800 to-blue-950 opacity-95"></div>
+    <div class="relative max-w-3xl mx-auto">
+        <p class="text-yellow-400 uppercase tracking-widest text-sm mb-3">Bem-vindo à</p>
+        <h1 class="text-4xl md:text-5xl font-bold mb-4 leading-tight">Igreja Batista Nova Vida</h1>
+        <p class="text-blue-200 text-lg mb-8">Rio Pardo – Rio Grande do Sul</p>
+        <p class="text-lg text-blue-100 mb-8 max-w-xl mx-auto">
+            Um lugar de fé, comunhão e esperança. Você é muito bem-vindo!
+        </p>
+        <div class="flex flex-wrap justify-center gap-4">
+            <a href="/cultos" class="bg-yellow-500 hover:bg-yellow-400 text-blue-900 font-bold px-6 py-3 rounded-lg transition">
+                Nossos Cultos
+            </a>
+            <a href="/sobre" class="border border-white hover:bg-white hover:text-blue-900 text-white font-bold px-6 py-3 rounded-lg transition">
+                Conheça-nos
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Cards de destaques -->
+<section class="max-w-6xl mx-auto px-4 py-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div class="bg-white rounded-xl shadow p-8 text-center hover:shadow-md transition">
+        <div class="text-4xl mb-4">🙏</div>
+        <h3 class="text-xl font-bold text-blue-900 mb-2">Cultos Semanais</h3>
+        <p class="text-gray-600 text-sm">Pregação da Palavra de Deus todos os domingos e durante a semana.</p>
+        <a href="/cultos" class="mt-4 inline-block text-blue-700 hover:underline text-sm font-medium">Ver horários →</a>
+    </div>
+    <div class="bg-white rounded-xl shadow p-8 text-center hover:shadow-md transition">
+        <div class="text-4xl mb-4">🤝</div>
+        <h3 class="text-xl font-bold text-blue-900 mb-2">Comunidade</h3>
+        <p class="text-gray-600 text-sm">Uma família unida em amor, fé e serviço ao próximo.</p>
+        <a href="/sobre" class="mt-4 inline-block text-blue-700 hover:underline text-sm font-medium">Saiba mais →</a>
+    </div>
+    <div class="bg-white rounded-xl shadow p-8 text-center hover:shadow-md transition">
+        <div class="text-4xl mb-4">📅</div>
+        <h3 class="text-xl font-bold text-blue-900 mb-2">Eventos</h3>
+        <p class="text-gray-600 text-sm">Confraternizações, conferências e eventos especiais ao longo do ano.</p>
+        <a href="/eventos" class="mt-4 inline-block text-blue-700 hover:underline text-sm font-medium">Ver eventos →</a>
+    </div>
+</section>
+
+<!-- Versículo -->
+<section class="bg-blue-50 py-12 px-4 text-center">
+    <div class="max-w-2xl mx-auto">
+        <p class="text-2xl text-blue-900 italic mb-3" style="font-family:'Playfair Display',serif">
+            "Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito, para que todo aquele que nele crê não pereça, mas tenha a vida eterna."
+        </p>
+        <p class="text-blue-600 font-semibold text-sm">João 3:16</p>
+    </div>
+</section>
+
+<!-- Como chegar -->
+<section class="max-w-6xl mx-auto px-4 py-16">
+    <h2 class="text-3xl font-bold text-blue-900 text-center mb-8">Como Chegar</h2>
+    <div class="bg-white rounded-xl shadow p-8 flex flex-col md:flex-row gap-8 items-center">
+        <div class="flex-1">
+            <p class="text-gray-600 mb-2"><strong>Endereço:</strong> Rio Pardo – RS</p>
+            <p class="text-gray-600 mb-4">Venha nos visitar. Você é muito bem-vindo!</p>
+            <a href="/contato" class="inline-block bg-blue-900 text-white px-5 py-2 rounded-lg hover:bg-blue-800 transition text-sm font-medium">
+                Fale conosco
+            </a>
+        </div>
+        <div class="flex-1 w-full h-48 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 text-sm">
+            Mapa em breve
+        </div>
+    </div>
+</section>
+{% endblock %}

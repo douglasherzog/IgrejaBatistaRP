@@ -1,0 +1,52 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="mb-8">
+    <h1 class="text-2xl font-bold text-blue-900">Dashboard</h1>
+    <p class="text-gray-500 text-sm">Bem-vindo à área administrativa</p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+    <div class="bg-white rounded-xl shadow p-6 border-l-4 border-blue-600">
+        <p class="text-sm text-gray-500 mb-1">Total de Membros</p>
+        <p class="text-3xl font-bold text-blue-900">{{ total_membros }}</p>
+        <a href="/admin/membros" class="text-xs text-blue-600 hover:underline mt-2 inline-block">Ver membros →</a>
+    </div>
+    <div class="bg-white rounded-xl shadow p-6 border-l-4 border-green-500">
+        <p class="text-sm text-gray-500 mb-1">Receitas do Mês</p>
+        <p class="text-3xl font-bold text-green-700">R$ {{ "%.2f"|format(total_receitas) }}</p>
+        <a href="/admin/caixa" class="text-xs text-green-600 hover:underline mt-2 inline-block">Ver caixa →</a>
+    </div>
+    <div class="bg-white rounded-xl shadow p-6 border-l-4 border-red-500">
+        <p class="text-sm text-gray-500 mb-1">Despesas do Mês</p>
+        <p class="text-3xl font-bold text-red-700">R$ {{ "%.2f"|format(total_despesas) }}</p>
+        <a href="/admin/caixa" class="text-xs text-red-600 hover:underline mt-2 inline-block">Ver caixa →</a>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="bg-white rounded-xl shadow p-6">
+        <h2 class="text-lg font-bold text-blue-900 mb-4">Ações rápidas</h2>
+        <div class="space-y-3">
+            <a href="/admin/membros/novo" class="flex items-center gap-3 bg-blue-50 hover:bg-blue-100 px-4 py-3 rounded-lg text-sm text-blue-800 transition">
+                <span>➕</span> Cadastrar novo membro
+            </a>
+            <a href="/admin/caixa/novo?tipo=receita" class="flex items-center gap-3 bg-green-50 hover:bg-green-100 px-4 py-3 rounded-lg text-sm text-green-800 transition">
+                <span>💵</span> Registrar dízimo/oferta
+            </a>
+            <a href="/admin/caixa/novo?tipo=despesa" class="flex items-center gap-3 bg-red-50 hover:bg-red-100 px-4 py-3 rounded-lg text-sm text-red-800 transition">
+                <span>📤</span> Registrar despesa
+            </a>
+        </div>
+    </div>
+    <div class="bg-white rounded-xl shadow p-6">
+        <h2 class="text-lg font-bold text-blue-900 mb-4">Saldo do Mês</h2>
+        <div class="text-center py-6">
+            <p class="text-sm text-gray-500 mb-1">Saldo atual</p>
+            <p class="text-4xl font-bold {% if saldo >= 0 %}text-green-700{% else %}text-red-700{% endif %}">
+                R$ {{ "%.2f"|format(saldo) }}
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}{% if lancamento %}Editar Lançamento{% else %}Novo Lançamento{% endif %}{% endblock %}
+{% block content %}
+<div class="mb-6">
+    <a href="/admin/caixa" class="text-sm text-blue-600 hover:underline">← Voltar</a>
+    <h1 class="text-2xl font-bold text-blue-900 mt-1">
+        {% if lancamento %}Editar Lançamento{% else %}Novo Lançamento{% endif %}
+    </h1>
+</div>
+
+<form method="post"
+    action="{% if lancamento %}/admin/caixa/{{ lancamento.id }}/editar{% else %}/admin/caixa/novo{% endif %}"
+    class="bg-white rounded-xl shadow p-8 max-w-xl">
+
+    <div class="space-y-5">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo *</label>
+            <select name="tipo" id="tipo" required onchange="atualizarCategorias()"
+                class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="receita" {% if tipo_pre == 'receita' %}selected{% endif %}>Receita (Dízimo/Oferta)</option>
+                <option value="despesa" {% if tipo_pre == 'despesa' %}selected{% endif %}>Despesa</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Categoria *</label>
+            <select name="categoria" id="categoria" required
+                class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                {% set cat_atual = lancamento.categoria if lancamento else '' %}
+                {% for c in categorias_receita %}
+                <option value="{{ c }}" data-tipo="receita" {% if c == cat_atual %}selected{% endif %}>{{ c }}</option>
+                {% endfor %}
+                {% for c in categorias_despesa %}
+                <option value="{{ c }}" data-tipo="despesa" {% if c == cat_atual %}selected{% endif %}>{{ c }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Descrição *</label>
+            <input type="text" name="descricao" required
+                value="{{ lancamento.descricao if lancamento else '' }}"
+                class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Valor (R$) *</label>
+            <input type="number" name="valor" step="0.01" min="0.01" required
+                value="{{ lancamento.valor if lancamento else '' }}"
+                class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Data *</label>
+            <input type="date" name="data" required
+                value="{{ lancamento.data.isoformat() if lancamento else '' }}"
+                class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Observações</label>
+            <textarea name="observacoes" rows="3"
+                class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">{{ lancamento.observacoes or '' if lancamento else '' }}</textarea>
+        </div>
+    </div>
+
+    <div class="flex gap-3 mt-6">
+        <button type="submit" class="bg-blue-900 text-white px-6 py-2 rounded-lg hover:bg-blue-800 transition text-sm font-medium">
+            {% if lancamento %}Salvar alterações{% else %}Registrar{% endif %}
+        </button>
+        <a href="/admin/caixa" class="px-6 py-2 border rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition">Cancelar</a>
+    </div>
+</form>
+
+<script>
+const categoriasReceita = {{ categorias_receita | tojson }};
+const categoriasDespesa = {{ categorias_despesa | tojson }};
+
+function atualizarCategorias() {
+    const tipo = document.getElementById('tipo').value;
+    const sel = document.getElementById('categoria');
+    const opts = sel.querySelectorAll('option');
+    opts.forEach(o => {
+        o.style.display = o.dataset.tipo === tipo ? '' : 'none';
+    });
+    const visivel = [...opts].find(o => o.dataset.tipo === tipo);
+    if (visivel) sel.value = visivel.value;
+}
+atualizarCategorias();
+</script>
+{% endblock %}

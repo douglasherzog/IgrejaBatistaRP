@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificação – IBNV</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Lato', sans-serif; }</style>
+</head>
+<body class="bg-blue-950 min-h-screen flex items-center justify-center">
+<div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-8">
+    <div class="text-center mb-8">
+        <div class="text-5xl mb-3">🔐</div>
+        <h1 class="text-2xl font-bold text-blue-900">Verificação em 2 etapas</h1>
+        <p class="text-gray-500 text-sm mt-2">Digite o código de 6 dígitos do seu aplicativo autenticador.</p>
+    </div>
+
+    {% if erro %}
+    <div class="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg p-3 mb-4">
+        {{ erro }}
+    </div>
+    {% endif %}
+
+    <form method="post" action="/admin/totp" class="space-y-4">
+        <input type="text" name="codigo" maxlength="6" pattern="\d{6}" required autofocus
+            placeholder="000000"
+            class="w-full border border-gray-300 rounded-lg px-4 py-3 text-center text-2xl tracking-widest focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <button type="submit"
+            class="w-full bg-blue-900 text-white py-2 rounded-lg hover:bg-blue-800 transition font-medium text-sm">
+            Verificar
+        </button>
+    </form>
+    <a href="/admin/login" class="block text-center text-xs text-gray-400 mt-4 hover:underline">← Voltar ao login</a>
+</div>
+</body>
+</html>
