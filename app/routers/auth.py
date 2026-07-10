@@ -30,10 +30,10 @@ def login(
             {"request": request, "erro": "Email ou senha incorretos"}
         )
     if not admin.totp_ativo:
-        return templates.TemplateResponse(
-            "admin/login.html",
-            {"request": request, "erro": "Configure o autenticador antes de fazer login"}
-        )
+        token = auth_service.criar_token({"sub": admin.id})
+        resp = RedirectResponse(url="/admin/dashboard", status_code=302)
+        resp.set_cookie("session_token", token, httponly=True, max_age=3600 * 8)
+        return resp
     token_temp = auth_service.criar_token({"sub": admin.id, "etapa": "totp"})
     resp = RedirectResponse(url="/admin/totp", status_code=302)
     resp.set_cookie("totp_token", token_temp, httponly=True, max_age=300)
