@@ -17,7 +17,7 @@
             <label class="block text-sm font-medium text-gray-700 mb-1">Tipo *</label>
             <select name="tipo" id="tipo" required onchange="atualizarCategorias()"
                 class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="receita" {% if tipo_pre == 'receita' %}selected{% endif %}>Receita (Dízimo/Oferta)</option>
+                <option value="receita" {% if tipo_pre == 'receita' %}selected{% endif %}>Receita</option>
                 <option value="despesa" {% if tipo_pre == 'despesa' %}selected{% endif %}>Despesa</option>
             </select>
         </div>
