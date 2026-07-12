@@ -8,9 +8,12 @@
             {{ ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][mes-1] }} / {{ ano }}
         </p>
     </div>
-    <a href="/admin/caixa/novo" class="bg-blue-900 text-white px-5 py-2 rounded-lg hover:bg-blue-800 transition text-sm font-medium">
-        + Novo Lançamento
-    </a>
+    <div class="flex gap-2">
+        <a href="/admin/relatorios/caixa" class="border border-blue-900 text-blue-900 px-4 py-2 rounded-lg hover:bg-blue-50 transition text-sm font-medium">📊 Relatório</a>
+        <a href="/admin/caixa/novo" class="bg-blue-900 text-white px-5 py-2 rounded-lg hover:bg-blue-800 transition text-sm font-medium">
+            + Novo Lançamento
+        </a>
+    </div>
 </div>
 
 <!-- Navegação de mês -->

@@ -1,0 +1,74 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Relatório Geral{% endblock %}
+{% block content %}
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-blue-900">📊 Relatório Geral</h1>
+    <p class="text-gray-500 text-sm">Visão consolidada de {{ ano }}</p>
+</div>
+
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    <div class="bg-white rounded-xl shadow p-4 text-center">
+        <p class="text-xs text-gray-500 uppercase">Membros</p>
+        <p class="text-2xl font-bold text-blue-900 mt-1">{{ total_membros }}</p>
+        <p class="text-xs text-green-600 mt-1">+{{ novos_mes }} este mês</p>
+    </div>
+    <div class="bg-white rounded-xl shadow p-4 text-center">
+        <p class="text-xs text-gray-500 uppercase">Eventos Futuros</p>
+        <p class="text-2xl font-bold text-purple-700 mt-1">{{ eventos_futuros }}</p>
+        <p class="text-xs text-gray-400 mt-1">{{ total_inscricoes }} inscrições</p>
+    </div>
+    <div class="bg-white rounded-xl shadow p-4 text-center">
+        <p class="text-xs text-gray-500 uppercase">Pedidos de Oração</p>
+        <p class="text-2xl font-bold text-amber-700 mt-1">{{ total_pedidos }}</p>
+        {% if pedidos_novos %}<p class="text-xs text-red-600 mt-1">{{ pedidos_novos }} novos 🔴</p>{% endif %}
+    </div>
+    <div class="bg-white rounded-xl shadow p-4 text-center">
+        <p class="text-xs text-gray-500 uppercase">Saldo do Ano</p>
+        {% set saldo_ano = rec_mes | sum - desp_mes | sum %}
+        <p class="text-2xl font-bold mt-1 {% if saldo_ano >= 0 %}text-green-700{% else %}text-red-700{% endif %}">R$ {{ "%.2f"|format(saldo_ano) }}</p>
+    </div>
+</div>
+
+<div class="bg-white rounded-xl shadow p-6 mb-6">
+    <h2 class="text-lg font-bold text-gray-800 mb-4">💰 Receitas x Despesas do Ano</h2>
+    <canvas id="graficoAnual" height="80"></canvas>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <a href="/admin/relatorios/caixa" class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition text-center">
+        <div class="text-3xl mb-2">📊</div>
+        <h3 class="font-bold text-gray-800">Relatório de Caixa</h3>
+        <p class="text-xs text-gray-400 mt-1">Gráficos mensais, categorias e exportação CSV</p>
+    </a>
+    <a href="/admin/relatorios/membros" class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition text-center">
+        <div class="text-3xl mb-2">👥</div>
+        <h3 class="font-bold text-gray-800">Relatório de Membros</h3>
+        <p class="text-xs text-gray-400 mt-1">Aniversariantes, batismos, crescimento e exportação CSV</p>
+    </a>
+    <a href="/admin/dashboard" class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition text-center">
+        <div class="text-3xl mb-2">🏠</div>
+        <h3 class="font-bold text-gray-800">Dashboard</h3>
+        <p class="text-xs text-gray-400 mt-1">Visão rápida do mês atual</p>
+    </a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script>
+var meses = {{ meses | tojson }};
+new Chart(document.getElementById('graficoAnual'), {
+    type: 'line',
+    data: {
+        labels: meses,
+        datasets: [
+            { label: 'Receitas', data: {{ rec_mes | tojson }}, borderColor: '#16a34a', backgroundColor: 'rgba(22,163,74,0.1)', fill: true },
+            { label: 'Despesas', data: {{ desp_mes | tojson }}, borderColor: '#dc2626', backgroundColor: 'rgba(220,38,38,0.1)', fill: true }
+        ]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { position: 'top' } },
+        scales: { y: { beginAtZero: true, ticks: { callback: function(v) { return 'R$ ' + v } } } }
+    }
+});
+</script>
+{% endblock %}

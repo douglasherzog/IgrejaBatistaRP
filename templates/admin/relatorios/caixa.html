@@ -1,0 +1,95 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Relatório de Caixa{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h1 class="text-2xl font-bold text-blue-900">📊 Relatório de Caixa</h1>
+        <p class="text-gray-500 text-sm">Ano: {{ ano }}</p>
+    </div>
+    <div class="flex gap-2">
+        <a href="/admin/relatorios/caixa?ano={{ ano - 1 }}" class="border px-3 py-2 rounded-lg text-sm hover:bg-gray-100 transition">← {{ ano - 1 }}</a>
+        <a href="/admin/relatorios/caixa?ano={{ ano + 1 }}" class="border px-3 py-2 rounded-lg text-sm hover:bg-gray-100 transition">{{ ano + 1 }} →</a>
+        <a href="/admin/relatorios/caixa/csv?ano={{ ano }}" class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition">📥 Exportar CSV</a>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div class="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
+        <p class="text-xs text-green-600 font-semibold uppercase">Total Receitas</p>
+        <p class="text-2xl font-bold text-green-700 mt-1">R$ {{ "%.2f"|format(total_receitas) }}</p>
+    </div>
+    <div class="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
+        <p class="text-xs text-red-600 font-semibold uppercase">Total Despesas</p>
+        <p class="text-2xl font-bold text-red-700 mt-1">R$ {{ "%.2f"|format(total_despesas) }}</p>
+    </div>
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
+        <p class="text-xs text-blue-600 font-semibold uppercase">Saldo do Ano</p>
+        <p class="text-2xl font-bold mt-1 {% if saldo_ano >= 0 %}text-blue-800{% else %}text-red-700{% endif %}">R$ {{ "%.2f"|format(saldo_ano) }}</p>
+    </div>
+</div>
+
+<div class="bg-white rounded-xl shadow p-6 mb-6">
+    <h2 class="text-lg font-bold text-gray-800 mb-4">Receitas x Despesas por Mês</h2>
+    <canvas id="graficoMensal" height="80"></canvas>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    {% if cat_receitas %}
+    <div class="bg-white rounded-xl shadow p-6">
+        <h2 class="text-lg font-bold text-gray-800 mb-4">Receitas por Categoria</h2>
+        <canvas id="graficoRecCat" height="120"></canvas>
+    </div>
+    {% endif %}
+    {% if cat_despesas %}
+    <div class="bg-white rounded-xl shadow p-6">
+        <h2 class="text-lg font-bold text-gray-800 mb-4">Despesas por Categoria</h2>
+        <canvas id="graficoDespCat" height="120"></canvas>
+    </div>
+    {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script>
+var meses = {{ meses | tojson }};
+var recMes = {{ receitas_mes | tojson }};
+var despMes = {{ despesas_mes | tojson }};
+
+new Chart(document.getElementById('graficoMensal'), {
+    type: 'bar',
+    data: {
+        labels: meses,
+        datasets: [
+            { label: 'Receitas', data: recMes, backgroundColor: '#16a34a' },
+            { label: 'Despesas', data: despMes, backgroundColor: '#dc2626' }
+        ]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { position: 'top' } },
+        scales: { y: { beginAtZero: true, ticks: { callback: function(v) { return 'R$ ' + v } } } }
+    }
+});
+
+{% if cat_receitas %}
+new Chart(document.getElementById('graficoRecCat'), {
+    type: 'doughnut',
+    data: {
+        labels: {{ cat_receitas.keys() | list | tojson }},
+        datasets: [{ data: {{ cat_receitas.values() | list | tojson }}, backgroundColor: ['#16a34a','#22c55e','#4ade80','#86efac','#bbf7d0','#dcfce7'] }]
+    },
+    options: { plugins: { legend: { position: 'bottom' } } }
+});
+{% endif %}
+
+{% if cat_despesas %}
+new Chart(document.getElementById('graficoDespCat'), {
+    type: 'doughnut',
+    data: {
+        labels: {{ cat_despesas.keys() | list | tojson }},
+        datasets: [{ data: {{ cat_despesas.values() | list | tojson }}, backgroundColor: ['#dc2626','#ef4444','#f87171','#fca5a5','#fecaca','#fee2e2'] }]
+    },
+    options: { plugins: { legend: { position: 'bottom' } } }
+});
+{% endif %}
+</script>
+{% endblock %}
