@@ -109,3 +109,39 @@ class Video(Base):
     ativo = Column(Boolean, default=True)
     criado_em = Column(DateTime, server_default=func.now())
     atualizado_em = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+
+class PedidoOracao(Base):
+    __tablename__ = "pedidos_oracao"
+
+    id = Column(Integer, primary_key=True, index=True)
+    nome = Column(String(100), nullable=False)
+    pedido = Column(Text, nullable=False)
+    publico = Column(Boolean, default=False)
+    status = Column(String(20), default="novo")
+    criado_em = Column(DateTime, server_default=func.now())
+
+
+class InscricaoEvento(Base):
+    __tablename__ = "inscricoes_evento"
+
+    id = Column(Integer, primary_key=True, index=True)
+    evento_id = Column(Integer, ForeignKey("eventos.id"), nullable=False)
+    nome = Column(String(100), nullable=False)
+    telefone = Column(String(20), nullable=True)
+    email = Column(String(255), nullable=True)
+    criado_em = Column(DateTime, server_default=func.now())
+    evento = relationship("Evento", backref="inscricoes")
+
+
+class Foto(Base):
+    __tablename__ = "fotos"
+
+    id = Column(Integer, primary_key=True, index=True)
+    titulo = Column(String(200), nullable=False)
+    descricao = Column(Text, nullable=True)
+    imagem_url = Column(String(500), nullable=False)
+    album = Column(String(100), nullable=True)
+    destaque = Column(Boolean, default=False)
+    ativo = Column(Boolean, default=True)
+    criado_em = Column(DateTime, server_default=func.now())

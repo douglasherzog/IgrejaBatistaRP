@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Galeria de Fotos – {{ cfg.nome_igreja }} {{ cfg.sigla_igreja }}{% endblock %}
+
+{% block content %}
+<section class="py-16 px-4 text-center text-white" style="background-color:var(--cor-primaria)">
+    <h1 class="font-bold mb-2" style="font-family:var(--fonte-titulos);font-size:2.8rem">Galeria de Fotos</h1>
+    <p style="color:var(--cor-destaque)">Momentos especiais da nossa igreja</p>
+</section>
+
+<section class="max-w-6xl mx-auto px-4 py-14">
+    {% if fotos %}
+    {% if albuns %}
+    <div class="flex flex-wrap gap-2 mb-8 justify-center">
+        <button onclick="filterFotos('')" class="px-4 py-2 text-sm rounded-lg transition font-medium"
+            style="background:var(--cor-primaria);color:white">Todas</button>
+        {% for album in albuns %}
+        <button onclick="filterFotos('{{ album }}')" class="px-4 py-2 text-sm rounded-lg border hover:bg-gray-100 transition"
+            style="color:var(--cor-primaria)">{{ album }}</button>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {% for f in fotos %}
+        <div class="foto-item bg-white rounded-xl shadow overflow-hidden cursor-pointer hover:shadow-lg transition"
+            data-album="{{ f.album or '' }}"
+            onclick="openLightbox('{{ f.imagem_url }}', '{{ f.titulo|replace("'", "\\'") }}')">
+            <div class="relative" style="padding-bottom:75%;height:0;overflow:hidden">
+                <img src="{{ f.imagem_url }}" alt="{{ f.titulo }}" loading="lazy"
+                    style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover"
+                    onerror="this.parentElement.parentElement.style.display='none'">
+            </div>
+            <div class="p-3">
+                <h3 class="text-sm font-medium text-gray-800 truncate">{{ f.titulo }}</h3>
+                {% if f.album %}<p class="text-xs text-gray-400">{{ f.album }}</p>{% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-16">
+        <p class="text-gray-400 text-lg mb-2">📸 Nenhuma foto na galeria ainda</p>
+        <p class="text-gray-400 text-sm">Em breve fotos dos eventos e celebrações da igreja.</p>
+    </div>
+    {% endif %}
+</section>
+
+{% if fotos %}
+<div id="lightbox" class="fixed inset-0 z-50 hidden items-center justify-center" style="background:rgba(0,0,0,0.9)" onclick="closeLightbox()">
+    <div class="relative max-w-4xl max-h-screen mx-4">
+        <img id="lightboxImg" src="" alt="" style="max-width:100%;max-height:85vh;border-radius:8px">
+        <p id="lightboxTitle" class="text-white text-center mt-4 text-lg font-medium"></p>
+    </div>
+    <button class="absolute top-4 right-6 text-white text-4xl hover:text-gray-300">✕</button>
+</div>
+
+<script>
+function openLightbox(url, titulo) {
+    var lb = document.getElementById('lightbox');
+    document.getElementById('lightboxImg').src = url;
+    document.getElementById('lightboxTitle').textContent = titulo;
+    lb.classList.remove('hidden');
+    lb.classList.add('flex');
+}
+function closeLightbox() {
+    var lb = document.getElementById('lightbox');
+    lb.classList.add('hidden');
+    lb.classList.remove('flex');
+}
+function filterFotos(album) {
+    var items = document.querySelectorAll('.foto-item');
+    items.forEach(function(item) {
+        if (!album || item.dataset.album === album) {
+            item.style.display = '';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeLightbox();
+});
+</script>
+{% endif %}
+{% endblock %}
