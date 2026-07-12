@@ -15,18 +15,195 @@ templates = Jinja2Templates(directory="templates")
 def listar_membros(
     request: Request,
     busca: str = "",
+    status: str = None,
+    cidade: str = None,
+    estado: str = None,
+    data_nascimento_inicio: str = None,
+    data_nascimento_fim: str = None,
+    data_batismo_inicio: str = None,
+    data_batismo_fim: str = None,
     db: Session = Depends(get_db),
     admin: Admin = Depends(get_admin_atual)
 ):
     query = db.query(Membro)
+    
+    # Filtro de busca por nome
     if busca:
         query = query.filter(
             (Membro.nome.ilike(f"%{busca}%")) |
             (Membro.sobrenome.ilike(f"%{busca}%"))
         )
+    
+    # Filtro por status
+    if status and status in ['ativo', 'inativo']:
+        query = query.filter(Membro.ativo == (status == 'ativo'))
+    
+    # Filtro por cidade
+    if cidade:
+        query = query.filter(Membro.cidade.ilike(f"%{cidade}%"))
+    
+    # Filtro por estado
+    if estado:
+        query = query.filter(Membro.estado.ilike(f"%{estado}%"))
+    
+    # Filtro por período de nascimento
+    if data_nascimento_inicio and data_nascimento_fim:
+        try:
+            inicio = date.fromisoformat(data_nascimento_inicio)
+            fim = date.fromisoformat(data_nascimento_fim)
+            query = query.filter(Membro.data_nascimento >= inicio, Membro.data_nascimento <= fim)
+        except ValueError:
+            pass
+    elif data_nascimento_inicio:
+        try:
+            inicio = date.fromisoformat(data_nascimento_inicio)
+            query = query.filter(Membro.data_nascimento >= inicio)
+        except ValueError:
+            pass
+    elif data_nascimento_fim:
+        try:
+            fim = date.fromisoformat(data_nascimento_fim)
+            query = query.filter(Membro.data_nascimento <= fim)
+        except ValueError:
+            pass
+    
+    # Filtro por período de batismo
+    if data_batismo_inicio and data_batismo_fim:
+        try:
+            inicio = date.fromisoformat(data_batismo_inicio)
+            fim = date.fromisoformat(data_batismo_fim)
+            query = query.filter(Membro.data_batismo >= inicio, Membro.data_batismo <= fim)
+        except ValueError:
+            pass
+    elif data_batismo_inicio:
+        try:
+            inicio = date.fromisoformat(data_batismo_inicio)
+            query = query.filter(Membro.data_batismo >= inicio)
+        except ValueError:
+            pass
+    elif data_batismo_fim:
+        try:
+            fim = date.fromisoformat(data_batismo_fim)
+            query = query.filter(Membro.data_batismo <= fim)
+        except ValueError:
+            pass
+    
     membros = query.order_by(Membro.nome).all()
+    
+    # Obter lista única de cidades e estados para filtros
+    cidades = db.query(Membro.cidade).filter(Membro.cidade.isnot(None)).distinct().order_by(Membro.cidade).all()
+    estados = db.query(Membro.estado).filter(Membro.estado.isnot(None)).distinct().order_by(Membro.estado).all()
+    
     return templates.TemplateResponse("admin/membros/lista.html", {
-        "request": request, "membros": membros, "busca": busca
+        "request": request, 
+        "membros": membros, 
+        "busca": busca,
+        "status": status,
+        "cidade": cidade,
+        "estado": estado,
+        "data_nascimento_inicio": data_nascimento_inicio,
+        "data_nascimento_fim": data_nascimento_fim,
+        "data_batismo_inicio": data_batismo_inicio,
+        "data_batismo_fim": data_batismo_fim,
+        "cidades": [c[0] for c in cidades if c[0]],
+        "estados": [e[0] for e in estados if e[0]],
+    })
+
+
+@router.get("/admin/membros/imprimir", response_class=HTMLResponse)
+def imprimir_membros(
+    request: Request,
+    busca: str = "",
+    status: str = None,
+    cidade: str = None,
+    estado: str = None,
+    data_nascimento_inicio: str = None,
+    data_nascimento_fim: str = None,
+    data_batismo_inicio: str = None,
+    data_batismo_fim: str = None,
+    db: Session = Depends(get_db),
+    admin: Admin = Depends(get_admin_atual)
+):
+    # Reutilizar a mesma lógica de filtros da listagem
+    query = db.query(Membro)
+    
+    if busca:
+        query = query.filter(
+            (Membro.nome.ilike(f"%{busca}%")) |
+            (Membro.sobrenome.ilike(f"%{busca}%"))
+        )
+    
+    if status and status in ['ativo', 'inativo']:
+        query = query.filter(Membro.ativo == (status == 'ativo'))
+    
+    if cidade:
+        query = query.filter(Membro.cidade.ilike(f"%{cidade}%"))
+    
+    if estado:
+        query = query.filter(Membro.estado.ilike(f"%{estado}%"))
+    
+    if data_nascimento_inicio and data_nascimento_fim:
+        try:
+            inicio = date.fromisoformat(data_nascimento_inicio)
+            fim = date.fromisoformat(data_nascimento_fim)
+            query = query.filter(Membro.data_nascimento >= inicio, Membro.data_nascimento <= fim)
+        except ValueError:
+            pass
+    elif data_nascimento_inicio:
+        try:
+            inicio = date.fromisoformat(data_nascimento_inicio)
+            query = query.filter(Membro.data_nascimento >= inicio)
+        except ValueError:
+            pass
+    elif data_nascimento_fim:
+        try:
+            fim = date.fromisoformat(data_nascimento_fim)
+            query = query.filter(Membro.data_nascimento <= fim)
+        except ValueError:
+            pass
+    
+    if data_batismo_inicio and data_batismo_fim:
+        try:
+            inicio = date.fromisoformat(data_batismo_inicio)
+            fim = date.fromisoformat(data_batismo_fim)
+            query = query.filter(Membro.data_batismo >= inicio, Membro.data_batismo <= fim)
+        except ValueError:
+            pass
+    elif data_batismo_inicio:
+        try:
+            inicio = date.fromisoformat(data_batismo_inicio)
+            query = query.filter(Membro.data_batismo >= inicio)
+        except ValueError:
+            pass
+    elif data_batismo_fim:
+        try:
+            fim = date.fromisoformat(data_batismo_fim)
+            query = query.filter(Membro.data_batismo <= fim)
+        except ValueError:
+            pass
+    
+    membros = query.order_by(Membro.nome).all()
+    
+    # Estatísticas
+    total = len(membros)
+    ativos = sum(1 for m in membros if m.ativo)
+    inativos = total - ativos
+    
+    return templates.TemplateResponse("admin/membros/imprimir.html", {
+        "request": request,
+        "membros": membros,
+        "busca": busca,
+        "status": status,
+        "cidade": cidade,
+        "estado": estado,
+        "data_nascimento_inicio": data_nascimento_inicio,
+        "data_nascimento_fim": data_nascimento_fim,
+        "data_batismo_inicio": data_batismo_inicio,
+        "data_batismo_fim": data_batismo_fim,
+        "total": total,
+        "ativos": ativos,
+        "inativos": inativos,
+        "hoje": date.today(),
     })
 
 
