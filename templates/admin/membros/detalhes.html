@@ -1,0 +1,180 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}{{ membro.nome }} {{ membro.sobrenome }} - Detalhes{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h1 class="text-2xl font-bold text-blue-900">👤 Detalhes do Membro</h1>
+        <p class="text-gray-500 text-sm">{{ membro.nome }} {{ membro.sobrenome }}</p>
+    </div>
+    <div class="flex gap-2">
+        <a href="/admin/membros" class="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition text-sm font-medium">
+            ← Voltar
+        </a>
+        <a href="/admin/membros/{{ membro.id }}/editar" class="bg-blue-900 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition text-sm font-medium">
+            ✏️ Editar
+        </a>
+    </div>
+</div>
+
+<!-- Informações do Membro -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+    <div class="lg:col-span-2 bg-white rounded-xl shadow p-6">
+        <h2 class="text-lg font-bold text-gray-800 mb-4">📋 Informações Pessoais</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <p class="text-sm text-gray-500">Nome Completo</p>
+                <p class="font-medium">{{ membro.nome }} {{ membro.sobrenome }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Status</p>
+                <p>
+                    {% if membro.ativo %}
+                        <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-medium">Ativo</span>
+                    {% else %}
+                        <span class="bg-red-100 text-red-700 px-2 py-0.5 rounded text-xs font-medium">Inativo</span>
+                    {% endif %}
+                </p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Data de Nascimento</p>
+                <p class="font-medium">{{ membro.data_nascimento.strftime('%d/%m/%Y') if membro.data_nascimento else '–' }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Data de Batismo</p>
+                <p class="font-medium">{{ membro.data_batismo.strftime('%d/%m/%Y') if membro.data_batismo else '–' }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Telefone</p>
+                <p class="font-medium">{{ membro.telefone or '–' }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Email</p>
+                <p class="font-medium text-blue-600">{{ membro.email or '–' }}</p>
+            </div>
+            <div class="md:col-span-2">
+                <p class="text-sm text-gray-500">Endereço Completo</p>
+                <p class="font-medium">
+                    {{ membro.endereco or '' }}{% if membro.endereco and membro.bairro %}, {% endif %}{{ membro.bairro or '' }}<br>
+                    {{ membro.cidade or '' }}{% if membro.cidade and membro.estado %} - {% endif %}{{ membro.estado or '' }}{% if membro.cep %}, CEP: {{ membro.cep }}{% endif %}
+                </p>
+            </div>
+            {% if membro.observacoes %}
+            <div class="md:col-span-2">
+                <p class="text-sm text-gray-500">Observações</p>
+                <p class="font-medium">{{ membro.observacoes }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-xl shadow p-6">
+        <h2 class="text-lg font-bold text-gray-800 mb-4">💰 Resumo Financeiro</h2>
+        <div class="text-center mb-4">
+            <p class="text-sm text-gray-500 mb-1">Total em Receitas</p>
+            <p class="text-3xl font-bold text-green-700">R$ {{ "%.2f"|format(total_receitas) }}</p>
+        </div>
+        
+        {% if categorias %}
+        <div class="mb-4">
+            <p class="text-sm text-gray-500 mb-2">Por Categoria</p>
+            {% for cat, valor in categorias.items() %}
+            <div class="flex justify-between text-sm mb-1">
+                <span>{{ cat }}</span>
+                <span class="font-medium">R$ {{ "%.2f"|format(valor) }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        {% if mensal %}
+        <div>
+            <p class="text-sm text-gray-500 mb-2">Últimos Meses</p>
+            {% for mes, valor in list(mensal.items())[:6] %}
+            <div class="flex justify-between text-sm mb-1">
+                <span>{{ mes.split('-')[1] }}/{{ mes.split('-')[0] }}</span>
+                <span class="font-medium">R$ {{ "%.2f"|format(valor) }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Filtros de Período -->
+<div class="bg-white rounded-xl shadow p-6 mb-6">
+    <h2 class="text-lg font-bold text-gray-800 mb-4">🔍 Filtros de Período</h2>
+    <form method="get" class="flex gap-4 items-end">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Data Início</label>
+            <input type="date" name="data_inicio" value="{{ data_inicio or '' }}"
+                class="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Data Fim</label>
+            <input type="date" name="data_fim" value="{{ data_fim or '' }}"
+                class="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <button type="submit" class="bg-blue-900 text-white px-6 py-2 rounded-lg text-sm hover:bg-blue-800 transition">
+            🔍 Filtrar
+        </button>
+        <a href="/admin/membros/{{ membro.id }}/detalhes" class="border border-gray-300 px-6 py-2 rounded-lg text-sm hover:bg-gray-50 transition">
+            Limpar
+        </a>
+    </form>
+    
+    {% if data_inicio or data_fim %}
+    <div class="mt-3 pt-3 border-t border-gray-200">
+        <p class="text-sm text-gray-600">
+            Período: {{ data_inicio or '?' }} a {{ data_fim or '?' }}
+        </p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Histórico de Receitas -->
+<div class="bg-white rounded-xl shadow">
+    <div class="p-6 border-b border-gray-200">
+        <h2 class="text-lg font-bold text-gray-800">📈 Histórico de Receitas</h2>
+        <p class="text-sm text-gray-500">{{ receitas|length }} lançamento(s) encontrado(s)</p>
+    </div>
+    
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead class="bg-gray-50 text-left">
+                <tr>
+                    <th class="px-6 py-3">Data</th>
+                    <th class="px-6 py-3">Categoria</th>
+                    <th class="px-6 py-3">Descrição</th>
+                    <th class="px-6 py-3 text-right">Valor</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% for r in receitas %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4">{{ r.data.strftime('%d/%m/%Y') }}</td>
+                    <td class="px-6 py-4">
+                        <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-medium">{{ r.categoria }}</span>
+                    </td>
+                    <td class="px-6 py-4">{{ r.descricao }}</td>
+                    <td class="px-6 py-4 text-right font-medium text-green-700">R$ {{ "%.2f"|format(r.valor) }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="text-center text-gray-400 py-8">
+                        Nenhuma receita encontrada para este membro.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            {% if receitas %}
+            <tfoot class="bg-gray-50">
+                <tr>
+                    <td colspan="3" class="px-6 py-4 text-right font-bold">Total:</td>
+                    <td class="px-6 py-4 text-right font-bold text-green-700">R$ {{ "%.2f"|format(total_receitas) }}</td>
+                </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+    </div>
+</div>
+{% endblock %}

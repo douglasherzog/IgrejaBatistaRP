@@ -227,6 +227,67 @@ def imprimir_membros(
     })
 
 
+@router.get("/admin/membros/{id}/detalhes", response_class=HTMLResponse)
+def detalhes_membro(
+    id: int,
+    request: Request,
+    data_inicio: str = None,
+    data_fim: str = None,
+    db: Session = Depends(get_db),
+    admin: Admin = Depends(get_admin_atual)
+):
+    membro = db.query(Membro).filter(Membro.id == id).first()
+    if not membro:
+        raise HTTPException(status_code=404)
+    
+    # Buscar receitas do membro
+    query = db.query(Lancamento).filter(
+        Lancamento.membro_id == membro.id,
+        Lancamento.tipo == TipoLancamento.receita
+    )
+    
+    # Aplicar filtro de período se fornecido
+    if data_inicio and data_fim:
+        try:
+            inicio = date.fromisoformat(data_inicio)
+            fim = date.fromisoformat(data_fim)
+            query = query.filter(Lancamento.data >= inicio, Lancamento.data <= fim)
+        except ValueError:
+            pass
+    
+    receitas = query.order_by(Lancamento.data.desc()).all()
+    
+    # Calcular estatísticas
+    total_receitas = sum(r.valor for r in receitas)
+    
+    # Agrupar por categoria
+    categorias = {}
+    for r in receitas:
+        if r.categoria not in categorias:
+            categorias[r.categoria] = 0
+        categorias[r.categoria] += r.valor
+    
+    # Agrupar por ano/mês
+    mensal = {}
+    for r in receitas:
+        chave = f"{r.data.year}-{r.data.month:02d}"
+        if chave not in mensal:
+            mensal[chave] = 0
+        mensal[chave] += r.valor
+    
+    return templates.TemplateResponse("admin/membros/detalhes.html", {
+        "request": request,
+        "membro": membro,
+        "receitas": receitas,
+        "total_receitas": total_receitas,
+        "categorias": dict(sorted(categorias.items())),
+        "mensal": dict(sorted(mensal.items(), reverse=True)),
+        "data_inicio": data_inicio,
+        "data_fim": data_fim,
+        "hoje": date.today(),
+    })
+
+
 @router.get("/admin/membros/novo", response_class=HTMLResponse)
 def novo_membro_page(request: Request, admin: Admin = Depends(get_admin_atual)):
     return templates.TemplateResponse("admin/membros/form.html", {

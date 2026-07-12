@@ -147,7 +147,11 @@
         <tbody class="divide-y divide-gray-100">
             {% for m in membros %}
             <tr class="hover:bg-gray-50">
-                <td class="px-4 py-3 font-medium text-blue-900">{{ m.nome }} {{ m.sobrenome }}</td>
+                <td class="px-4 py-3 font-medium">
+                    <a href="/admin/membros/{{ m.id }}/detalhes" class="text-blue-900 hover:text-blue-700 hover:underline">
+                        {{ m.nome }} {{ m.sobrenome }}
+                    </a>
+                </td>
                 <td class="px-4 py-3 text-gray-500 hidden md:table-cell">{{ m.telefone or '–' }}</td>
                 <td class="px-4 py-3 text-gray-500 hidden md:table-cell">
                     {{ m.data_nascimento.strftime('%d/%m/%Y') if m.data_nascimento else '–' }}
