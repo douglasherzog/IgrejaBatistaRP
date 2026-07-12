@@ -40,7 +40,7 @@
     <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
         <a href="/" class="flex items-center gap-3">
             <div class="rounded-full flex items-center justify-center" style="background:white;width:44px;height:44px;flex-shrink:0">
-                <img src="/static/img/logo.png" alt="Logo" style="width:54px;height:54px;object-fit:contain" onerror="this.parentElement.style.display='none'">
+                <img src="{{ cfg.logo_url | default('/static/img/logo.png') }}" alt="Logo" style="width:54px;height:54px;object-fit:contain" onerror="this.parentElement.style.display='none'">
             </div>
             <div>
                 <div class="text-base font-bold leading-tight tracking-wide" style="font-family:'Cormorant Garamond',serif;font-size:1.1rem">{{ cfg.nome_igreja | default('Igreja Batista Independente Nova Vida') }}</div>

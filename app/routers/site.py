@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, Request, Form, HTTPException
+import os
+import shutil
+from fastapi import APIRouter, Depends, Request, Form, HTTPException, UploadFile, File
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
@@ -18,6 +20,7 @@ SECOES = {
             ("sigla_igreja", "Sigla", "text", "IBINOVI", "Sigla ou nome curto da igreja. Ex: IBINOVI."),
             ("cidade_estado", "Cidade/Estado", "text", "Rio Pardo – RS", "Cidade e estado onde a igreja está localizada."),
             ("ano_fundacao", "Ano de Fundação", "text", "", "Ano em que a igreja foi fundada. Opcional."),
+            ("logo_url", "Logo (URL)", "text", "/static/img/logo.png", "URL da imagem do logo. Para enviar uma nova imagem, use o upload abaixo. Se deixar em branco, usa o logo padrão."),
         ],
     },
     "Home": {
@@ -193,3 +196,23 @@ def excluir_culto(
     db.delete(culto)
     db.commit()
     return RedirectResponse(url="/admin/site#cultos", status_code=302)
+
+
+@router.post("/admin/site/upload-logo")
+async def upload_logo(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    admin: Admin = Depends(get_admin_atual)
+):
+    upload_dir = os.path.join("static", "img")
+    os.makedirs(upload_dir, exist_ok=True)
+    ext = os.path.splitext(file.filename or "logo.png")[1] or ".png"
+    if ext.lower() not in (".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"):
+        ext = ".png"
+    dest = os.path.join(upload_dir, "logo" + ext)
+    with open(dest, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    logo_url = f"/static/img/logo{ext}"
+    set_config(db, "logo_url", logo_url)
+    db.commit()
+    return RedirectResponse(url="/admin/site?ok=1#geral", status_code=302)

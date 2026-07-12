@@ -53,6 +53,22 @@
                 {% if ajuda %}<p class="text-xs text-gray-400 mt-1">💡 {{ ajuda }}</p>{% endif %}
             </div>
             {% endfor %}
+            {% if nome_secao == 'Geral' %}
+            <div class="md:col-span-2 mt-2 pt-4 border-t">
+                <label class="block text-xs font-medium text-gray-600 mb-2">🖼️ Enviar nova imagem do logo</label>
+                <div class="flex items-center gap-4">
+                    <div class="rounded-full flex items-center justify-center bg-white border" style="width:60px;height:60px;flex-shrink:0">
+                        <img src="{{ configs.get('logo_url', '/static/img/logo.png') }}" alt="Logo atual" style="width:70px;height:70px;object-fit:contain" onerror="this.parentElement.style.display='none'">
+                    </div>
+                    <form method="post" action="/admin/site/upload-logo" enctype="multipart/form-data" class="flex-1">
+                        <input type="file" name="file" accept="image/png,image/jpeg,image/gif,image/webp,image/svg+xml"
+                            class="text-sm text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-900 file:text-white hover:file:bg-blue-800 file:cursor-pointer">
+                        <p class="text-xs text-gray-400 mt-1">💡 Selecione um arquivo de imagem (PNG, JPG, GIF, WebP ou SVG). A imagem substituirá o logo atual no site.</p>
+                        <button type="submit" class="mt-2 bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition">📤 Enviar Logo</button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
         </div>
     </div>
     {% endfor %}
