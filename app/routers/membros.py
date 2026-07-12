@@ -90,6 +90,16 @@ def listar_membros(
     
     membros = query.order_by(Membro.nome).all()
     
+    # Calcular receita total para cada membro
+    from app.models import Lancamento, TipoLancamento
+    
+    for membro in membros:
+        receitas = db.query(Lancamento).filter(
+            Lancamento.membro_id == membro.id,
+            Lancamento.tipo == TipoLancamento.receita
+        ).all()
+        membro.receita_total = sum(r.valor for r in receitas)
+    
     # Obter lista única de cidades e estados para filtros
     cidades = db.query(Membro.cidade).filter(Membro.cidade.isnot(None)).distinct().order_by(Membro.cidade).all()
     estados = db.query(Membro.estado).filter(Membro.estado.isnot(None)).distinct().order_by(Membro.estado).all()
@@ -183,6 +193,16 @@ def imprimir_membros(
             pass
     
     membros = query.order_by(Membro.nome).all()
+    
+    # Calcular receita total para cada membro
+    from app.models import Lancamento, TipoLancamento
+    
+    for membro in membros:
+        receitas = db.query(Lancamento).filter(
+            Lancamento.membro_id == membro.id,
+            Lancamento.tipo == TipoLancamento.receita
+        ).all()
+        membro.receita_total = sum(r.valor for r in receitas)
     
     # Estatísticas
     total = len(membros)

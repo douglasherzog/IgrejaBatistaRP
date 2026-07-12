@@ -139,6 +139,7 @@
                 <th class="px-4 py-3 hidden md:table-cell">Dt. Nascimento</th>
                 <th class="px-4 py-3 hidden md:table-cell">Dt. Batismo</th>
                 <th class="px-4 py-3 hidden md:table-cell">Cidade</th>
+                <th class="px-4 py-3 hidden md:table-cell">Receita Total</th>
                 <th class="px-4 py-3 hidden md:table-cell">Status</th>
                 <th class="px-4 py-3 text-right">Ações</th>
             </tr>
@@ -155,6 +156,13 @@
                     {{ m.data_batismo.strftime('%d/%m/%Y') if m.data_batismo else '–' }}
                 </td>
                 <td class="px-4 py-3 text-gray-500 hidden md:table-cell">{{ m.cidade or '–' }}</td>
+                <td class="px-4 py-3 text-gray-500 hidden md:table-cell font-medium">
+                    {% if m.receita_total > 0 %}
+                        R$ {{ "%.2f"|format(m.receita_total) }}
+                    {% else %}
+                        –
+                    {% endif %}
+                </td>
                 <td class="px-4 py-3 hidden md:table-cell">
                     {% if m.ativo %}
                         <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-medium">Ativo</span>
@@ -172,7 +180,7 @@
             </tr>
             {% else %}
             <tr>
-                <td colspan="7" class="text-center text-gray-400 py-8">Nenhum membro encontrado.</td>
+                <td colspan="8" class="text-center text-gray-400 py-8">Nenhum membro encontrado.</td>
             </tr>
             {% endfor %}
         </tbody>

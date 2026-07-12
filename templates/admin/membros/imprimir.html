@@ -143,6 +143,12 @@
             font-size: 8pt;
         }
         
+        .receita {
+            width: 70pt;
+            text-align: right;
+            font-size: 9pt;
+        }
+        
         .status-ativo {
             background-color: #f0f8f0;
         }
@@ -228,6 +234,7 @@
                 <th class="nascimento">Nascimento</th>
                 <th class="batismo">Batismo</th>
                 <th class="localizacao">Cidade/UF</th>
+                <th class="receita">Receita Total</th>
                 <th class="status">Status</th>
             </tr>
         </thead>
@@ -246,11 +253,18 @@
                         -
                     {% endif %}
                 </td>
+                <td class="receita" style="text-align: right; font-weight: bold;">
+                    {% if m.receita_total > 0 %}
+                        R$ {{ "%.2f"|format(m.receita_total) }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
                 <td class="status">{{ 'Ativo' if m.ativo else 'Inativo' }}</td>
             </tr>
             {% else %}
             <tr>
-                <td colspan="7" style="text-align: center; padding: 20pt;">
+                <td colspan="8" style="text-align: center; padding: 20pt;">
                     Nenhum membro encontrado para os filtros selecionados.
                 </td>
             </tr>
