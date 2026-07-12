@@ -4,7 +4,7 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from datetime import date
 from app.database import get_db
-from app.models import Membro, Admin
+from app.models import Membro, Admin, Lancamento, TipoLancamento
 from app.auth import get_admin_atual
 
 router = APIRouter()
@@ -91,8 +91,6 @@ def listar_membros(
     membros = query.order_by(Membro.nome).all()
     
     # Calcular receita total para cada membro
-    from app.models import Lancamento, TipoLancamento
-    
     for membro in membros:
         receitas = db.query(Lancamento).filter(
             Lancamento.membro_id == membro.id,
@@ -195,8 +193,6 @@ def imprimir_membros(
     membros = query.order_by(Membro.nome).all()
     
     # Calcular receita total para cada membro
-    from app.models import Lancamento, TipoLancamento
-    
     for membro in membros:
         receitas = db.query(Lancamento).filter(
             Lancamento.membro_id == membro.id,
