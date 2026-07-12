@@ -100,6 +100,87 @@ def listar_lancamentos(
     return templates.TemplateResponse("admin/caixa/lista.html", context)
 
 
+@router.get("/admin/caixa/imprimir", response_class=HTMLResponse)
+def imprimir_lancamentos(
+    request: Request,
+    mes: int = None,
+    ano: int = None,
+    data_inicio: str = None,
+    data_fim: str = None,
+    categoria: str = None,
+    tipo: str = None,
+    membro_id: int = None,
+    db: Session = Depends(get_db),
+    admin: Admin = Depends(get_admin_atual)
+):
+    hoje = date.today()
+    
+    # Montar query base (mesma lógica da listagem)
+    query = db.query(Lancamento)
+    
+    # Filtros
+    if data_inicio and data_fim:
+        try:
+            inicio = date.fromisoformat(data_inicio)
+            fim = date.fromisoformat(data_fim)
+            query = query.filter(Lancamento.data >= inicio, Lancamento.data <= fim)
+        except ValueError:
+            pass
+    elif mes and ano:
+        query = query.filter(
+            extract("month", Lancamento.data) == mes,
+            extract("year", Lancamento.data) == ano
+        )
+    else:
+        query = query.filter(
+            extract("month", Lancamento.data) == hoje.month,
+            extract("year", Lancamento.data) == hoje.year
+        )
+    
+    if categoria:
+        query = query.filter(Lancamento.categoria == categoria)
+    
+    if tipo and tipo in ['receita', 'despesa']:
+        query = query.filter(Lancamento.tipo == TipoLancamento(tipo))
+    
+    if membro_id:
+        query = query.filter(Lancamento.membro_id == membro_id)
+    
+    # Ordenar por data
+    lancamentos = query.order_by(Lancamento.data.asc()).all()  # ordem crescente para impressão
+    
+    # Calcular totais
+    total_receitas = sum(l.valor for l in lancamentos if l.tipo == TipoLancamento.receita)
+    total_despesas = sum(l.valor for l in lancamentos if l.tipo == TipoLancamento.despesa)
+    saldo = total_receitas - total_despesas
+    
+    # Obter informações do membro se filtrado
+    membro_filtrado = None
+    if membro_id:
+        membro_filtrado = db.query(Membro).filter(Membro.id == membro_id).first()
+    
+    # Preparar contexto para template de impressão
+    context = {
+        "request": request,
+        "lancamentos": lancamentos,
+        "total_receitas": total_receitas,
+        "total_despesas": total_despesas,
+        "saldo": saldo,
+        "mes": mes or hoje.month,
+        "ano": ano or hoje.year,
+        "data_inicio": data_inicio,
+        "data_fim": data_fim,
+        "categoria": categoria,
+        "tipo": tipo,
+        "membro_id": membro_id,
+        "membro_filtrado": membro_filtrado,
+        "tipo_lancamento": TipoLancamento,
+        "hoje": hoje,
+    }
+    
+    return templates.TemplateResponse("admin/caixa/imprimir.html", context)
+
+
 @router.get("/admin/caixa/novo", response_class=HTMLResponse)
 def novo_lancamento_page(
     request: Request,

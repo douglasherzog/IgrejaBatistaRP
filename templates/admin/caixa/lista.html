@@ -21,6 +21,9 @@
     </div>
     <div class="flex gap-2">
         <a href="/admin/relatorios/caixa" class="border border-blue-900 text-blue-900 px-4 py-2 rounded-lg hover:bg-blue-50 transition text-sm font-medium">📊 Relatório</a>
+        <button onclick="imprimirComFiltros()" class="border border-purple-600 text-purple-600 px-4 py-2 rounded-lg hover:bg-purple-50 transition text-sm font-medium">
+            🖨️ Imprimir
+        </button>
         <a href="/admin/caixa/novo" class="bg-blue-900 text-white px-5 py-2 rounded-lg hover:bg-blue-800 transition text-sm font-medium">
             + Novo Lançamento
         </a>
@@ -258,5 +261,26 @@ document.addEventListener('keydown', function(e) {
         filtrarTabela();
     }
 });
+
+// Função para imprimir com filtros ativos
+function imprimirComFiltros() {
+    // Obter parâmetros da URL atual
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    // Construir URL de impressão com os mesmos parâmetros
+    let imprimirUrl = '/admin/caixa/imprimir';
+    
+    if (urlParams.toString()) {
+        imprimirUrl += '?' + urlParams.toString();
+    }
+    
+    // Abrir em nova janela para impressão
+    const janelaImpressao = window.open(imprimirUrl, '_blank', 'width=800,height=600');
+    
+    // Focar na nova janela
+    if (janelaImpressao) {
+        janelaImpressao.focus();
+    }
+}
 </script>
 {% endblock %}

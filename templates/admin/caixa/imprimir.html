@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório de Caixa</title>
+    <style>
+        @page {
+            margin: 1cm;
+            size: A4;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Times New Roman', serif;
+            font-size: 12pt;
+            line-height: 1.4;
+            color: #000;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20pt;
+            border-bottom: 2pt solid #333;
+            padding-bottom: 10pt;
+        }
+        
+        .header h1 {
+            font-size: 18pt;
+            font-weight: bold;
+            margin-bottom: 5pt;
+        }
+        
+        .header p {
+            font-size: 10pt;
+            color: #666;
+        }
+        
+        .info-periodo {
+            margin-bottom: 15pt;
+            font-size: 11pt;
+        }
+        
+        .info-periodo strong {
+            font-weight: bold;
+        }
+        
+        .totais {
+            margin-bottom: 15pt;
+            display: flex;
+            justify-content: space-between;
+            gap: 20pt;
+        }
+        
+        .total-box {
+            flex: 1;
+            text-align: center;
+            padding: 8pt;
+            border: 1pt solid #ccc;
+        }
+        
+        .total-box .label {
+            font-size: 9pt;
+            text-transform: uppercase;
+            margin-bottom: 3pt;
+        }
+        
+        .total-box .valor {
+            font-size: 14pt;
+            font-weight: bold;
+        }
+        
+        .total-box.receitas .valor {
+            color: #000;
+        }
+        
+        .total-box.despesas .valor {
+            color: #000;
+        }
+        
+        .total-box.saldo .valor {
+            color: #000;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15pt;
+        }
+        
+        th, td {
+            border: 1pt solid #000;
+            padding: 4pt 6pt;
+            text-align: left;
+            vertical-align: top;
+        }
+        
+        th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+            font-size: 10pt;
+        }
+        
+        td {
+            font-size: 10pt;
+        }
+        
+        .data {
+            width: 60pt;
+            text-align: center;
+        }
+        
+        .tipo {
+            width: 70pt;
+            text-align: center;
+        }
+        
+        .categoria {
+            width: 100pt;
+        }
+        
+        .descricao {
+            min-width: 150pt;
+        }
+        
+        .dizimista {
+            width: 120pt;
+        }
+        
+        .valor {
+            width: 80pt;
+            text-align: right;
+            font-weight: bold;
+        }
+        
+        .tipo-receita {
+            background-color: #f0f8f0;
+        }
+        
+        .tipo-despesa {
+            background-color: #f8f0f0;
+        }
+        
+        .footer {
+            margin-top: 20pt;
+            text-align: center;
+            font-size: 9pt;
+            color: #666;
+            border-top: 1pt solid #ccc;
+            padding-top: 10pt;
+        }
+        
+        .no-print {
+            display: none;
+        }
+        
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            
+            .page-break {
+                page-break-before: always;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Relatório de Caixa</h1>
+        <p>Igreja Batista Nova Vida - Rio Pardo/RS</p>
+    </div>
+    
+    <div class="info-periodo">
+        <strong>Período:</strong> 
+        {% if data_inicio and data_fim %}
+            {{ data_inicio }} a {{ data_fim }}
+        {% elif mes and ano %}
+            {{ ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][mes-1] }} / {{ ano }}
+        {% else %}
+            Mês atual
+        {% endif %}
+        <br>
+        {% if categoria %}<strong>Categoria:</strong> {{ categoria }}<br>{% endif %}
+        {% if tipo %}<strong>Tipo:</strong> {{ tipo }}<br>{% endif %}
+        {% if membro_filtrado %}<strong>Membro:</strong> {{ membro_filtrado.nome }} {{ membro_filtrado.sobrenome }}<br>{% endif %}
+        <strong>Emitido em:</strong> {{ hoje.strftime('%d/%m/%Y às %H:%M') }}
+    </div>
+    
+    <div class="totais">
+        <div class="total-box receitas">
+            <div class="label">Receitas</div>
+            <div class="valor">R$ {{ "%.2f"|format(total_receitas) }}</div>
+        </div>
+        <div class="total-box despesas">
+            <div class="label">Despesas</div>
+            <div class="valor">R$ {{ "%.2f"|format(total_despesas) }}</div>
+        </div>
+        <div class="total-box saldo">
+            <div class="label">Saldo</div>
+            <div class="valor">R$ {{ "%.2f"|format(saldo) }}</div>
+        </div>
+    </div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th class="data">Data</th>
+                <th class="tipo">Tipo</th>
+                <th class="categoria">Categoria</th>
+                <th class="descricao">Descrição</th>
+                <th class="dizimista">Dizimista</th>
+                <th class="valor">Valor</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for l in lancamentos %}
+            <tr class="tipo-{{ l.tipo.value }}">
+                <td class="data">{{ l.data.strftime('%d/%m/%Y') }}</td>
+                <td class="tipo">{{ l.tipo.value|title }}</td>
+                <td class="categoria">{{ l.categoria }}</td>
+                <td class="descricao">{{ l.descricao }}</td>
+                <td class="dizimista">
+                    {% if l.categoria == 'Dízimo' and l.membro %}
+                        {{ l.membro.nome }} {{ l.membro.sobrenome }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td class="valor">R$ {{ "%.2f"|format(l.valor) }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 20pt;">
+                    Nenhum lançamento encontrado para o período selecionado.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% if lancamentos %}
+    <div class="totais">
+        <div class="total-box receitas">
+            <div class="label">Total Receitas</div>
+            <div class="valor">R$ {{ "%.2f"|format(total_receitas) }}</div>
+        </div>
+        <div class="total-box despesas">
+            <div class="label">Total Despesas</div>
+            <div class="valor">R$ {{ "%.2f"|format(total_despesas) }}</div>
+        </div>
+        <div class="total-box saldo">
+            <div class="label">Saldo Final</div>
+            <div class="valor">R$ {{ "%.2f"|format(saldo) }}</div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <div class="footer">
+        Relatório gerado pelo sistema administrativo da Igreja Batista Nova Vida
+    </div>
+    
+    <div class="no-print" style="margin-top: 20pt; text-align: center;">
+        <button onclick="window.print()" style="padding: 10pt 20pt; font-size: 12pt;">
+            🖨️ Imprimir
+        </button>
+        <button onclick="window.close()" style="margin-left: 10pt; padding: 10pt 20pt; font-size: 12pt;">
+            Fechar
+        </button>
+    </div>
+</body>
+</html>
