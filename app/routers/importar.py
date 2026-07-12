@@ -60,22 +60,30 @@ def processar_planilha(df, db):
         "membros_importados": 0,
         "lancamentos_importados": 0,
         "erros": [],
-        "warnings": []
+        "warnings": [],
+        "colunas_encontradas": df.columns.tolist(),
+        "total_linhas": len(df)
     }
     
     # Detectar colunas
     colunas = df.columns.tolist()
+    colunas_lower = [col.lower().strip() for col in colunas]
+    
+    # Mostrar informações sobre a planilha
+    print(f"Colunas encontradas: {colunas}")
+    print(f"Total de linhas: {len(df)}")
     
     # Verificar se é uma planilha de membros
-    if any(col.lower() in ['nome', 'nome completo', 'name'] for col in colunas):
+    membros_keywords = ['nome', 'nome completo', 'name', 'membro', 'membros']
+    if any(keyword in ' '.join(colunas_lower) for keyword in membros_keywords):
         resultado.update(importar_membros(df, db))
     
-    # Verificar se é uma planilha de lançamentos
-    elif any(col.lower() in ['data', 'date', 'valor', 'value'] for col in colunas):
+    # Verificar se é uma planilha de lançamentos financeiros
+    elif any(keyword in ' '.join(colunas_lower) for keyword in ['data', 'date', 'valor', 'value', 'lançamento', 'lancamento', 'caixa']):
         resultado.update(importar_lancamentos(df, db))
     
     else:
-        resultado["erros"].append("Formato de planilha não reconhecido")
+        resultado["erros"].append(f"Formato de planilha não reconhecido. Colunas encontradas: {', '.join(colunas)}")
     
     return resultado
 
@@ -169,19 +177,34 @@ def importar_membros(df, db):
 def importar_lancamentos(df, db):
     resultado = {"lancamentos_importados": 0, "erros": [], "warnings": []}
     
-    # Mapeamento de colunas
+    # Mapeamento de colunas expandido
     col_map = {
         'data': 'data',
         'date': 'data',
+        'dt': 'data',
+        'data lancamento': 'data',
+        'data do lançamento': 'data',
         'valor': 'valor',
         'value': 'valor',
+        'vlr': 'valor',
+        'valor (r$)': 'valor',
+        'valor rs': 'valor',
+        'descrição': 'descricao',
         'descricao': 'descricao',
         'description': 'descricao',
+        'historico': 'descricao',
+        'histórico': 'descricao',
         'categoria': 'categoria',
         'type': 'categoria',
-        'tipo': 'tipo',
+        'tipo': 'categoria',
+        'classificação': 'categoria',
+        'classificacao': 'categoria',
         'membro': 'membro_nome',
-        'dizimista': 'membro_nome'
+        'dizimista': 'membro_nome',
+        'nome do membro': 'membro_nome',
+        'nome dizimista': 'membro_nome',
+        'responsavel': 'membro_nome',
+        'responsável': 'membro_nome'
     }
     
     # Obter todos os membros para busca
@@ -215,9 +238,21 @@ def importar_lancamentos(df, db):
                     # Tratar valor
                     elif campo == 'valor':
                         if isinstance(valor, str):
-                            valor = float(valor.replace('R$', '').replace(',', '.').strip())
+                            # Remove espaços e símbolos monetários
+                            valor_str = valor.strip().replace('R$', '').replace('$', '').replace(' ', '')
+                            # Substitui vírgula por ponto para casas decimais, mas primeiro remove pontos de milhar
+                            if ',' in valor_str and '.' in valor_str:
+                                # Formato brasileiro: 1.234,56
+                                valor_str = valor_str.replace('.', '').replace(',', '.')
+                            elif ',' in valor_str:
+                                # Formato simples: 123,56
+                                valor_str = valor_str.replace(',', '.')
+                            try:
+                                valor = float(valor_str)
+                            except ValueError:
+                                valor = 0.0
                         else:
-                            valor = float(valor)
+                            valor = float(valor) if pd.notna(valor) else 0.0
                     
                     # Tratar tipo
                     elif campo == 'tipo':
