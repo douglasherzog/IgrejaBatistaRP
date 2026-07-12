@@ -21,34 +21,83 @@ def listar_lancamentos(
     request: Request,
     mes: int = None,
     ano: int = None,
+    data_inicio: str = None,
+    data_fim: str = None,
+    categoria: str = None,
+    tipo: str = None,
+    membro_id: int = None,
     db: Session = Depends(get_db),
     admin: Admin = Depends(get_admin_atual)
 ):
     hoje = date.today()
-    mes = mes or hoje.month
-    ano = ano or hoje.year
-
-    query = db.query(Lancamento).filter(
-        extract("month", Lancamento.data) == mes,
-        extract("year", Lancamento.data) == ano
-    ).order_by(Lancamento.data.desc())
-
-    lancamentos = query.all()
-
+    
+    # Montar query base
+    query = db.query(Lancamento)
+    
+    # Filtros
+    if data_inicio and data_fim:
+        # Período personalizado
+        try:
+            inicio = date.fromisoformat(data_inicio)
+            fim = date.fromisoformat(data_fim)
+            query = query.filter(Lancamento.data >= inicio, Lancamento.data <= fim)
+        except ValueError:
+            pass  # Se datas inválidas, ignora
+    elif mes and ano:
+        # Filtro por mês/ano (mantido para compatibilidade)
+        query = query.filter(
+            extract("month", Lancamento.data) == mes,
+            extract("year", Lancamento.data) == ano
+        )
+    else:
+        # Padrão: mês atual
+        query = query.filter(
+            extract("month", Lancamento.data) == hoje.month,
+            extract("year", Lancamento.data) == hoje.year
+        )
+    
+    # Filtros adicionais
+    if categoria:
+        query = query.filter(Lancamento.categoria == categoria)
+    
+    if tipo and tipo in ['receita', 'despesa']:
+        query = query.filter(Lancamento.tipo == TipoLancamento(tipo))
+    
+    if membro_id:
+        query = query.filter(Lancamento.membro_id == membro_id)
+    
+    # Ordenar
+    lancamentos = query.order_by(Lancamento.data.desc()).all()
+    
+    # Calcular totais
     total_receitas = sum(l.valor for l in lancamentos if l.tipo == TipoLancamento.receita)
     total_despesas = sum(l.valor for l in lancamentos if l.tipo == TipoLancamento.despesa)
     saldo = total_receitas - total_despesas
-
-    return templates.TemplateResponse("admin/caixa/lista.html", {
+    
+    # Obter lista de membros para filtro
+    membros = db.query(Membro).filter(Membro.ativo == True).order_by(Membro.nome).all()
+    
+    # Preparar contexto para template
+    context = {
         "request": request,
         "lancamentos": lancamentos,
         "total_receitas": total_receitas,
         "total_despesas": total_despesas,
         "saldo": saldo,
-        "mes": mes,
-        "ano": ano,
-        "tipo_lancamento": TipoLancamento
-    })
+        "mes": mes or hoje.month,
+        "ano": ano or hoje.year,
+        "data_inicio": data_inicio,
+        "data_fim": data_fim,
+        "categoria": categoria,
+        "tipo": tipo,
+        "membro_id": membro_id,
+        "tipo_lancamento": TipoLancamento,
+        "categorias_receita": CATEGORIAS_RECEITA,
+        "categorias_despesa": CATEGORIAS_DESPESA,
+        "membros": membros,
+    }
+    
+    return templates.TemplateResponse("admin/caixa/lista.html", context)
 
 
 @router.get("/admin/caixa/novo", response_class=HTMLResponse)
