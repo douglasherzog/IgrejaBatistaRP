@@ -1,0 +1,47 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Vídeos – Admin{% endblock %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">📺 Vídeos do YouTube</h1>
+    <a href="/admin/videos/novo" class="bg-blue-900 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-800 transition">+ Novo Vídeo</a>
+</div>
+
+{% if videos %}
+<div class="space-y-3">
+    {% for v in videos %}
+    <div class="bg-white rounded-xl shadow p-4 flex items-center gap-4">
+        {% if v.youtube_id %}
+        <img src="https://img.youtube.com/vi/{{ v.youtube_id }}/mqdefault.jpg" alt="{{ v.titulo }}"
+            style="width:120px;height:67px;object-fit:cover;border-radius:8px;flex-shrink:0">
+        {% else %}
+        <div style="width:120px;height:67px;border-radius:8px;flex-shrink:0;background:#e5e7eb;display:flex;align-items:center;justify-content:center">
+            <span class="text-gray-400 text-xs">Sem preview</span>
+        </div>
+        {% endif %}
+        <div class="flex-1">
+            <div class="flex items-center gap-2">
+                <h3 class="font-semibold text-gray-800">{{ v.titulo }}</h3>
+                {% if v.destaque %}<span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded">⭐ Destaque</span>{% endif %}
+                {% if not v.ativo %}<span class="text-xs bg-gray-200 text-gray-500 px-2 py-0.5 rounded">Inativo</span>{% endif %}
+            </div>
+            {% if v.descricao %}<p class="text-sm text-gray-500 mt-1">{{ v.descricao[:80] }}{% if v.descricao|length > 80 %}...{% endif %}</p>{% endif %}
+            <p class="text-xs text-gray-400 mt-1">🔗 {{ v.youtube_url }}</p>
+        </div>
+        <div class="flex gap-2 flex-shrink-0">
+            <a href="/admin/videos/{{ v.id }}/editar" class="text-blue-600 hover:text-blue-800 text-sm">Editar</a>
+            <form method="post" action="/admin/videos/{{ v.id }}/excluir" onsubmit="return confirm('Excluir este vídeo?')">
+                <button type="submit" class="text-red-600 hover:text-red-800 text-sm">Excluir</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="bg-white rounded-xl shadow p-12 text-center">
+    <p class="text-gray-400 text-lg mb-2">📺 Nenhum vídeo cadastrado</p>
+    <p class="text-gray-400 text-sm mb-4">Cadastre os vídeos do canal do YouTube da igreja para exibi-los no site.</p>
+    <a href="/admin/videos/novo" class="inline-block bg-blue-900 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-800 transition">+ Cadastrar primeiro vídeo</a>
+</div>
+{% endif %}
+{% endblock %}

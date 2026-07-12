@@ -76,6 +76,7 @@ SECOES = {
             ("facebook_texto", "Texto do Facebook", "text", "Facebook: /ibnvrp", "Texto exibido no link do Facebook. Ex: Facebook: /ibnvrp"),
             ("instagram_link", "Link do Instagram", "text", "https://www.instagram.com/ibinovi_rp/", "URL completa do perfil do Instagram."),
             ("instagram_texto", "Texto do Instagram", "text", "Instagram: @ibinovi_rp", "Texto exibido no link do Instagram. Ex: Instagram: @ibinovi_rp"),
+            ("youtube_canal", "Link do Canal do YouTube", "text", "", "URL completa do canal do YouTube da igreja. Ex: https://www.youtube.com/@ibinovi_rp. Deixe em branco se não tiver canal. Aparece como botão na página de Vídeos."),
             ("maps_embed", "Google Maps - URL do embed (src do iframe)", "textarea", "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3473.2!2d-52.3864082!3d-29.983285!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x951b5d32bfce9c5b%3A0xcf1e16321d0d8a49!2sIgreja%20Batista%20Nova%20Vida!5e0!3m2!1spt!2sbr!4v1", "Cole aqui a URL do embed do Google Maps. Para obter: vá no Google Maps > Compartilhar > Incorporar mapa > copie o conteúdo do src do iframe."),
         ],
     },

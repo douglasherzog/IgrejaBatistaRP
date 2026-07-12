@@ -4,7 +4,7 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from datetime import date
 from app.database import get_db
-from app.models import ConfiguracaoSite, Culto, Evento
+from app.models import ConfiguracaoSite, Culto, Evento, Video
 from app.routers.site import get_all_configs
 
 router = APIRouter()
@@ -66,4 +66,23 @@ def contato(request: Request, db: Session = Depends(get_db)):
     return templates.TemplateResponse("publico/contato.html", {
         "request": request,
         "cfg": configs,
+    })
+
+
+@router.get("/videos", response_class=HTMLResponse)
+def videos(request: Request, db: Session = Depends(get_db)):
+    configs = get_all_configs(db)
+    video_destaque = db.query(Video).filter(
+        Video.ativo == True, Video.destaque == True
+    ).order_by(Video.criado_em.desc()).first()
+    outros = db.query(Video).filter(
+        Video.ativo == True
+    ).order_by(Video.criado_em.desc()).all()
+    if video_destaque:
+        outros = [v for v in outros if v.id != video_destaque.id]
+    return templates.TemplateResponse("publico/videos.html", {
+        "request": request,
+        "cfg": configs,
+        "video_destaque": video_destaque,
+        "outros_videos": outros,
     })

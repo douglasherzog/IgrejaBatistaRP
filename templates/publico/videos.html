@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Vídeos – {{ cfg.nome_igreja }} {{ cfg.sigla_igreja }}{% endblock %}
+
+{% block content %}
+<section class="py-16 px-4 text-center text-white" style="background-color:var(--cor-primaria)">
+    <h1 class="font-bold mb-2" style="font-family:var(--fonte-titulos);font-size:2.8rem">Vídeos</h1>
+    <p style="color:var(--cor-destaque)">Mensagens, cultos e eventos da nossa igreja</p>
+</section>
+
+<section class="max-w-5xl mx-auto px-4 py-14">
+
+    {% if video_destaque %}
+    <div class="mb-10">
+        <h2 class="text-2xl font-bold mb-4" style="font-family:var(--fonte-titulos);color:var(--cor-primaria)">⭐ Em Destaque</h2>
+        <div class="bg-white rounded-xl shadow overflow-hidden">
+            <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden">
+                <iframe src="https://www.youtube.com/embed/{{ video_destaque.youtube_id }}"
+                    style="position:absolute;top:0;left:0;width:100%;height:100%;border:0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen></iframe>
+            </div>
+            <div class="p-6">
+                <h3 class="text-xl font-bold mb-2" style="font-family:var(--fonte-titulos);color:var(--cor-primaria)">{{ video_destaque.titulo }}</h3>
+                {% if video_destaque.descricao %}<p class="text-sm text-gray-600 leading-relaxed">{{ video_destaque.descricao }}</p>{% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if outros_videos %}
+    <h2 class="text-2xl font-bold mb-6" style="font-family:var(--fonte-titulos);color:var(--cor-primaria)">Todos os Vídeos</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {% for v in outros_videos %}
+        <div class="bg-white rounded-xl shadow overflow-hidden hover:shadow-lg transition cursor-pointer"
+            onclick="openVideo('{{ v.youtube_id }}', '{{ v.titulo|replace("'", "\\'") }}')">
+            <div class="relative" style="padding-bottom:56.25%;height:0;overflow:hidden">
+                <img src="https://img.youtube.com/vi/{{ v.youtube_id }}/mqdefault.jpg" alt="{{ v.titulo }}"
+                    style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover">
+                <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:54px;height:54px;background:rgba(0,0,0,0.7);border-radius:50%;display:flex;align-items:center;justify-content:center">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                </div>
+            </div>
+            <div class="p-4">
+                <h3 class="font-bold text-sm mb-1" style="color:#1a1a1a">{{ v.titulo }}</h3>
+                {% if v.descricao %}<p class="text-xs text-gray-500 line-clamp-2">{{ v.descricao }}</p>{% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if not video_destaque and not outros_videos %}
+    <div class="text-center py-16">
+        <p class="text-gray-400 text-lg mb-2">📺 Nenhum vídeo disponível</p>
+        <p class="text-gray-400 text-sm">Em breve novos vídeos serão adicionados aqui.</p>
+    </div>
+    {% endif %}
+
+    {% if cfg.youtube_canal %}
+    <div class="text-center mt-12 pt-8 border-t">
+        <a href="{{ cfg.youtube_canal }}" target="_blank"
+            class="inline-flex items-center gap-2 text-white px-6 py-3 rounded-lg text-sm font-medium transition"
+            style="background:#FF0000" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            Visite nosso canal no YouTube
+        </a>
+    </div>
+    {% endif %}
+</section>
+
+{% if outros_videos %}
+<div id="videoModal" class="fixed inset-0 z-50 hidden items-center justify-center" style="background:rgba(0,0,0,0.85)">
+    <div class="relative w-full max-w-4xl mx-4">
+        <button onclick="closeVideo()" class="absolute -top-10 right-0 text-white text-2xl hover:text-gray-300">✕</button>
+        <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;overflow:hidden">
+            <iframe id="modalFrame" src="" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen></iframe>
+        </div>
+        <h3 id="modalTitle" class="text-white text-lg font-bold mt-4"></h3>
+    </div>
+</div>
+
+<script>
+function openVideo(ytId, titulo) {
+    var modal = document.getElementById('videoModal');
+    var frame = document.getElementById('modalFrame');
+    var title = document.getElementById('modalTitle');
+    frame.src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1';
+    title.textContent = titulo;
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+function closeVideo() {
+    var modal = document.getElementById('videoModal');
+    var frame = document.getElementById('modalFrame');
+    frame.src = '';
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+document.getElementById('videoModal').addEventListener('click', function(e) {
+    if (e.target === this) closeVideo();
+});
+</script>
+{% endif %}
+{% endblock %}

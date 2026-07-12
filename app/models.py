@@ -95,3 +95,17 @@ class Evento(Base):
     ativo = Column(Boolean, default=True)
     criado_em = Column(DateTime, server_default=func.now())
     atualizado_em = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+
+class Video(Base):
+    __tablename__ = "videos"
+
+    id = Column(Integer, primary_key=True, index=True)
+    titulo = Column(String(200), nullable=False)
+    descricao = Column(Text, nullable=True)
+    youtube_url = Column(String(500), nullable=False)
+    youtube_id = Column(String(50), nullable=True)
+    destaque = Column(Boolean, default=False)
+    ativo = Column(Boolean, default=True)
+    criado_em = Column(DateTime, server_default=func.now())
+    atualizado_em = Column(DateTime, server_default=func.now(), onupdate=func.now())
