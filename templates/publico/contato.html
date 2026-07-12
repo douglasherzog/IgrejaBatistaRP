@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% block title %}Contato – IBINOVI Rio Pardo/RS{% endblock %}
+{% block title %}Contato – {{ cfg.nome_igreja }} {{ cfg.sigla_igreja }}{% endblock %}
 {% block content %}
 <section class="bg-blue-900 text-white py-16 px-4 text-center">
-    <h1 class="text-4xl font-bold mb-2">Entre em Contato</h1>
-    <p class="text-blue-200">Estamos aqui para recebê-lo</p>
+    <h1 class="text-4xl font-bold mb-2">{{ cfg.contato_titulo }}</h1>
+    <p class="text-blue-200">{{ cfg.contato_subtitulo }}</p>
 </section>
 <section class="max-w-4xl mx-auto px-4 py-14">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -13,45 +13,37 @@
                 <span class="text-2xl">📍</span>
                 <div>
                     <p class="font-semibold">Endereço</p>
-                    <p class="text-sm text-gray-500">Rua Nicolau Matte Pessoa de Brum, 158</p>
-                    <p class="text-sm text-gray-500">Bairro Higino Leitão – Rio Pardo/RS</p>
+                    <p class="text-sm text-gray-500">{{ cfg.endereco_rua }}</p>
+                    <p class="text-sm text-gray-500">{{ cfg.endereco_bairro }}</p>
                 </div>
             </div>
             <div class="flex items-start gap-3">
                 <span class="text-2xl">📞</span>
                 <div>
                     <p class="font-semibold">Telefone</p>
-                    <p class="text-sm text-gray-500">(51) 99726-7850</p>
-                    <a href="https://wa.me/5551997267850" target="_blank" class="text-xs text-green-600 hover:underline">💬 Chamar no WhatsApp</a>
+                    <p class="text-sm text-gray-500">{{ cfg.telefone }}</p>
+                    <a href="{{ cfg.whatsapp_link }}" target="_blank" class="text-xs text-green-600 hover:underline">💬 Chamar no WhatsApp</a>
                 </div>
             </div>
             <div class="flex items-start gap-3">
                 <span class="text-2xl">✉️</span>
                 <div>
                     <p class="font-semibold">E-mail</p>
-                    <a href="mailto:ibnvriopardo@gmail.com" class="text-sm text-blue-600 hover:underline">ibnvriopardo@gmail.com</a>
-                </div>
-            </div>
-            <div class="flex items-start gap-3">
-                <span class="text-2xl">🕙</span>
-                <div>
-                    <p class="font-semibold">Cultos</p>
-                    <p class="text-sm text-gray-500">Ter 19h30 | Qua 15h | Qui 19h30</p>
-                    <p class="text-sm text-gray-500">Sex 19h30 | Dom 19h (Celebração)</p>
+                    <a href="mailto:{{ cfg.email }}" class="text-sm text-blue-600 hover:underline">{{ cfg.email }}</a>
                 </div>
             </div>
             <div class="flex items-start gap-3">
                 <span class="text-2xl">📘</span>
                 <div>
                     <p class="font-semibold">Redes Sociais</p>
-                    <a href="https://www.facebook.com/ibnvrp" target="_blank" class="text-sm text-blue-600 hover:underline block">Facebook: /ibnvrp</a>
-                    <a href="https://www.instagram.com/ibinovi_rp/" target="_blank" class="text-sm text-pink-600 hover:underline block">Instagram: @ibinovi_rp</a>
+                    <a href="{{ cfg.facebook_link }}" target="_blank" class="text-sm text-blue-600 hover:underline block">{{ cfg.facebook_texto }}</a>
+                    <a href="{{ cfg.instagram_link }}" target="_blank" class="text-sm text-pink-600 hover:underline block">{{ cfg.instagram_texto }}</a>
                 </div>
             </div>
         </div>
         <div class="bg-white rounded-xl shadow overflow-hidden" style="min-height:400px">
             <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3473.2!2d-52.3864082!3d-29.983285!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x951b5d32bfce9c5b%3A0xcf1e16321d0d8a49!2sIgreja%20Batista%20Nova%20Vida!5e0!3m2!1spt!2sbr!4v1"
+                src="{{ cfg.maps_embed }}"
                 width="100%" height="100%" style="border:0;min-height:400px" allowfullscreen loading="lazy"
                 referrerpolicy="no-referrer-when-downgrade">
             </iframe>

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Programação – IBINOVI Rio Pardo/RS{% endblock %}
+{% block title %}Programação – {{ cfg.nome_igreja }} {{ cfg.sigla_igreja }}{% endblock %}
 {% block content %}
 <section class="py-16 px-4 text-center text-white" style="background-color:#8B1A1A">
     <h1 class="font-bold mb-2" style="font-family:'Cormorant Garamond',serif;font-size:2.8rem">Programação Semanal</h1>
@@ -8,58 +8,19 @@
 
 <section class="max-w-3xl mx-auto px-4 py-14">
     <div class="space-y-4">
-
-        <div class="bg-white shadow flex items-center gap-6 p-6" style="border-left:4px solid #8B1A1A">
+        {% for c in cultos %}
+        <div class="shadow flex items-center gap-6 p-6 {% if c.destaque %}text-white{% else %}bg-white{% endif %}"
+            style="border-left:4px solid {% if c.destaque %}#f0c0c0{% else %}#8B1A1A{% endif %};{% if c.destaque %}background-color:#8B1A1A{% endif %}">
             <div class="text-center" style="min-width:90px">
-                <p class="font-bold uppercase text-xs tracking-widest" style="color:#8B1A1A">Terça-feira</p>
-                <p class="text-2xl font-bold" style="font-family:'Cormorant Garamond',serif;color:#1a1a1a">19h30</p>
+                <p class="font-bold uppercase text-xs tracking-widest" style="color:{% if c.destaque %}#f0c0c0{% else %}#8B1A1A{% endif %}">{{ c.dia_semana }}</p>
+                <p class="text-2xl font-bold" style="font-family:'Cormorant Garamond',serif;color:{% if c.destaque %}white{% else %}#1a1a1a{% endif %}">{{ c.horario }}</p>
             </div>
             <div>
-                <h3 class="font-bold text-lg" style="font-family:'Cormorant Garamond',serif;color:#1a1a1a">Terça do Despertar</h3>
+                <h3 class="font-bold text-lg" style="font-family:'Cormorant Garamond',serif;color:{% if c.destaque %}white{% else %}#1a1a1a{% endif %}">{{ c.nome }}</h3>
+                {% if c.descricao %}<p class="text-sm mt-1" style="color:{% if c.destaque %}#f0c0c0{% else %}#6b7280{% endif %}">{{ c.descricao }}</p>{% endif %}
             </div>
         </div>
-
-        <div class="bg-white shadow flex items-center gap-6 p-6" style="border-left:4px solid #8B1A1A">
-            <div class="text-center" style="min-width:90px">
-                <p class="font-bold uppercase text-xs tracking-widest" style="color:#8B1A1A">Quarta-feira</p>
-                <p class="text-2xl font-bold" style="font-family:'Cormorant Garamond',serif;color:#1a1a1a">15h00</p>
-            </div>
-            <div>
-                <h3 class="font-bold text-lg" style="font-family:'Cormorant Garamond',serif;color:#1a1a1a">Reunião de Oração</h3>
-            </div>
-        </div>
-
-        <div class="bg-white shadow flex items-center gap-6 p-6" style="border-left:4px solid #8B1A1A">
-            <div class="text-center" style="min-width:90px">
-                <p class="font-bold uppercase text-xs tracking-widest" style="color:#8B1A1A">Quinta-feira</p>
-                <p class="text-2xl font-bold" style="font-family:'Cormorant Garamond',serif;color:#1a1a1a">19h30</p>
-            </div>
-            <div>
-                <h3 class="font-bold text-lg" style="font-family:'Cormorant Garamond',serif;color:#1a1a1a">Jovens New Life</h3>
-                <p class="text-sm text-gray-500 mt-1">Na casa do Irmão Tiago Glashorester</p>
-            </div>
-        </div>
-
-        <div class="bg-white shadow flex items-center gap-6 p-6" style="border-left:4px solid #8B1A1A">
-            <div class="text-center" style="min-width:90px">
-                <p class="font-bold uppercase text-xs tracking-widest" style="color:#8B1A1A">Sexta-feira</p>
-                <p class="text-2xl font-bold" style="font-family:'Cormorant Garamond',serif;color:#1a1a1a">19h30</p>
-            </div>
-            <div>
-                <h3 class="font-bold text-lg" style="font-family:'Cormorant Garamond',serif;color:#1a1a1a">Reunião de Oração</h3>
-            </div>
-        </div>
-
-        <div class="shadow flex items-center gap-6 p-6 text-white" style="border-left:4px solid #f0c0c0;background-color:#8B1A1A">
-            <div class="text-center" style="min-width:90px">
-                <p class="font-bold uppercase text-xs tracking-widest" style="color:#f0c0c0">Domingo</p>
-                <p class="text-2xl font-bold" style="font-family:'Cormorant Garamond',serif">19h00</p>
-            </div>
-            <div>
-                <h3 class="font-bold text-lg" style="font-family:'Cormorant Garamond',serif">Culto de Celebração</h3>
-            </div>
-        </div>
-
+        {% endfor %}
     </div>
     <p class="text-center text-gray-400 text-xs mt-8 uppercase tracking-widest">* Horários sujeitos a alterações em datas especiais.</p>
 </section>

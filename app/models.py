@@ -55,3 +55,27 @@ class Lancamento(Base):
     membro_id = Column(Integer, ForeignKey("membros.id"), nullable=True)
     membro = relationship("Membro", backref="lancamentos")
     criado_em = Column(DateTime, server_default=func.now())
+
+
+class ConfiguracaoSite(Base):
+    __tablename__ = "configuracoes_site"
+
+    id = Column(Integer, primary_key=True, index=True)
+    chave = Column(String(100), unique=True, nullable=False, index=True)
+    valor = Column(Text, nullable=True)
+    atualizado_em = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+
+class Culto(Base):
+    __tablename__ = "cultos"
+
+    id = Column(Integer, primary_key=True, index=True)
+    dia_semana = Column(String(50), nullable=False)
+    horario = Column(String(20), nullable=False)
+    nome = Column(String(100), nullable=False)
+    descricao = Column(String(255), nullable=True)
+    destaque = Column(Boolean, default=False)
+    ordem = Column(Integer, default=0)
+    ativo = Column(Boolean, default=True)
+    criado_em = Column(DateTime, server_default=func.now())
+    atualizado_em = Column(DateTime, server_default=func.now(), onupdate=func.now())
