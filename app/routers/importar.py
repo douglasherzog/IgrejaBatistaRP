@@ -73,9 +73,12 @@ def processar_planilha(df, db):
     print(f"Colunas encontradas: {colunas}")
     print(f"Total de linhas: {len(df)}")
     
+    # Verificar se é formato de livro caixa tradicional (sua planilha)
+    if any('livro caixa' in str(col).lower() or 'nomes' in str(col).lower() for col in colunas):
+        resultado.update(importar_livro_caixa_tradicional(df, db))
+    
     # Verificar se é uma planilha de membros
-    membros_keywords = ['nome', 'nome completo', 'name', 'membro', 'membros']
-    if any(keyword in ' '.join(colunas_lower) for keyword in membros_keywords):
+    elif any(keyword in ' '.join(colunas_lower) for keyword in ['nome', 'nome completo', 'name', 'membro', 'membros']):
         resultado.update(importar_membros(df, db))
     
     # Verificar se é uma planilha de lançamentos financeiros
@@ -84,6 +87,127 @@ def processar_planilha(df, db):
     
     else:
         resultado["erros"].append(f"Formato de planilha não reconhecido. Colunas encontradas: {', '.join(colunas)}")
+    
+    return resultado
+
+
+def importar_livro_caixa_tradicional(df, db):
+    resultado = {"lancamentos_importados": 0, "erros": [], "warnings": []}
+    
+    try:
+        # Encontrar a linha de cabeçalho correta (onde está "NOMES")
+        header_row = None
+        for idx, row in df.iterrows():
+            if any('nomes' in str(cell).lower() for cell in row if pd.notna(cell)):
+                header_row = idx
+                break
+        
+        if header_row is None:
+            resultado["erros"].append("Não foi possível encontrar a linha de cabeçalho 'NOMES'")
+            return resultado
+        
+        # Re-ler a planilha a partir da linha de cabeçalho
+        df_data = pd.read_excel(r"C:\Users\Usuario\Downloads\LIVRO CAIXA IBINOVI - ANO 2026.xlsx", 
+                               skiprows=header_row, header=0)
+        
+        # Renomear colunas para nomes padrão
+        col_mapping = {}
+        for col in df_data.columns:
+            col_str = str(col).lower().strip()
+            if 'nomes' in col_str:
+                col_mapping[col] = 'nome'
+            elif 'entradas' in col_str:
+                col_mapping[col] = 'valor_entrada'
+            elif 'data' in col_str and 'entradas' in df_data.columns and col != df_data.columns[df_data.columns.get_loc('valor_entrada') + 1]:
+                col_mapping[col] = 'data_entrada'
+            elif 'saídas' in col_str and 'valor' not in col_str:
+                col_mapping[col] = 'valor_saida'
+            elif 'data' in col_str and 'saídas' in df_data.columns:
+                col_mapping[col] = 'data_saida'
+            elif 'descrição' in col_str or 'descricao' in col_str:
+                col_mapping[col] = 'descricao'
+        
+        df_data = df_data.rename(columns=col_mapping)
+        
+        # Obter todos os membros para busca
+        membros = db.query(Membro).all()
+        membro_map = {f"{m.nome} {m.sobrenome}".lower(): m for m in membros}
+        
+        # Processar cada linha
+        for index, row in df_data.iterrows():
+            try:
+                # Pular linha se não tiver nome
+                if pd.isna(row.get('nome')) or str(row.get('nome')).strip() == '':
+                    continue
+                
+                nome = str(row.get('nome')).strip()
+                
+                # Processar ENTRADA
+                if pd.notna(row.get('valor_entrada')) and str(row.get('valor_entrada')).strip() != '':
+                    valor_str = str(row.get('valor_entrada')).replace('R$', '').replace(',', '.').strip()
+                    try:
+                        valor = float(valor_str)
+                        if valor > 0:
+                            lancamento = Lancamento()
+                            lancamento.valor = valor
+                            lancamento.tipo = TipoLancamento.receita
+                            lancamento.descricao = nome
+                            lancamento.categoria = 'Dízimo' if 'dízimo' in nome.lower() else 'Oferta'
+                            
+                            # Data da entrada
+                            if pd.notna(row.get('data_entrada')):
+                                try:
+                                    lancamento.data = pd.to_datetime(row.get('data_entrada')).date()
+                                except:
+                                    lancamento.data = date.today()
+                            else:
+                                lancamento.data = date.today()
+                            
+                            # Tentar encontrar membro
+                            nome_lower = nome.lower()
+                            if nome_lower in membro_map:
+                                lancamento.membro_id = membro_map[nome_lower].id
+                            
+                            db.add(lancamento)
+                            resultado["lancamentos_importados"] += 1
+                    except ValueError:
+                        resultado["warnings"].append(f"Valor de entrada inválido na linha {index + 2}: {valor_str}")
+                
+                # Processar SAÍDA
+                if pd.notna(row.get('valor_saida')) and str(row.get('valor_saida')).strip() != '':
+                    valor_str = str(row.get('valor_saida')).replace('R$', '').replace(',', '.').strip()
+                    try:
+                        valor = float(valor_str)
+                        if valor > 0:
+                            lancamento = Lancamento()
+                            lancamento.valor = valor
+                            lancamento.tipo = TipoLancamento.despesa
+                            lancamento.descricao = row.get('descricao', nome)
+                            lancamento.categoria = 'Despesa Geral'
+                            
+                            # Data da saída
+                            if pd.notna(row.get('data_saida')):
+                                try:
+                                    lancamento.data = pd.to_datetime(row.get('data_saida')).date()
+                                except:
+                                    lancamento.data = date.today()
+                            else:
+                                lancamento.data = date.today()
+                            
+                            db.add(lancamento)
+                            resultado["lancamentos_importados"] += 1
+                    except ValueError:
+                        resultado["warnings"].append(f"Valor de saída inválido na linha {index + 2}: {valor_str}")
+                
+            except Exception as e:
+                resultado["erros"].append(f"Erro na linha {index + 2}: {str(e)}")
+        
+        # Salvar tudo
+        db.commit()
+        
+    except Exception as e:
+        db.rollback()
+        resultado["erros"].append(f"Erro ao processar livro caixa: {str(e)}")
     
     return resultado
 
