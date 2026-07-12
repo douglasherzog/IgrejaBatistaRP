@@ -1,16 +1,16 @@
 {% extends "base.html" %}
 {% block title %}Eventos – {{ cfg.nome_igreja }} {{ cfg.sigla_igreja }}{% endblock %}
 {% block content %}
-<section class="py-16 px-4 text-center text-white" style="background-color:#8B1A1A">
-    <h1 class="font-bold mb-2" style="font-family:'Cormorant Garamond',serif;font-size:2.8rem">Eventos</h1>
-    <p style="color:#f0c0c0">Fique por dentro das nossas próximas atividades</p>
+<section class="py-16 px-4 text-center text-white" style="background-color:var(--cor-primaria)">
+    <h1 class="font-bold mb-2" style="font-family:var(--fonte-titulos);font-size:2.8rem">Eventos</h1>
+    <p style="color:var(--cor-destaque)">Fique por dentro das nossas próximas atividades</p>
 </section>
 
 <section class="max-w-5xl mx-auto px-4 py-14">
 
     <!-- Eventos futuros -->
     {% if eventos_futuros %}
-    <h2 class="text-2xl font-bold mb-6" style="font-family:'Cormorant Garamond',serif;color:#8B1A1A">Próximos Eventos</h2>
+    <h2 class="text-2xl font-bold mb-6" style="font-family:var(--fonte-titulos);color:var(--cor-primaria)">Próximos Eventos</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
         {% for e in eventos_futuros %}
         <div class="bg-white rounded-xl shadow overflow-hidden hover:shadow-lg transition {% if e.destaque %}ring-2 ring-yellow-400{% endif %}">
@@ -22,13 +22,13 @@
             {% endif %}
             <div class="p-6">
                 <div class="flex items-center gap-2 mb-3">
-                    <span class="text-xs font-bold uppercase tracking-widest text-white px-3 py-1 rounded" style="background:#8B1A1A">
+                    <span class="text-xs font-bold uppercase tracking-widest text-white px-3 py-1 rounded" style="background:var(--cor-primaria)">
                         {{ e.data.strftime('%d/%m') }}
                     </span>
                     {% if e.horario %}<span class="text-xs text-gray-500">{{ e.horario }}</span>{% endif %}
                     {% if e.destaque %}<span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded">⭐ Destaque</span>{% endif %}
                 </div>
-                <h3 class="text-xl font-bold mb-2" style="font-family:'Cormorant Garamond',serif;color:#1a1a1a">{{ e.titulo }}</h3>
+                <h3 class="text-xl font-bold mb-2" style="font-family:var(--fonte-titulos);color:#1a1a1a">{{ e.titulo }}</h3>
                 {% if e.descricao %}<p class="text-sm text-gray-600 mb-3 leading-relaxed">{{ e.descricao }}</p>{% endif %}
                 {% if e.local %}<p class="text-xs text-gray-400">📍 {{ e.local }}</p>{% endif %}
             </div>
@@ -39,7 +39,7 @@
 
     <!-- Eventos passados -->
     {% if eventos_passados %}
-    <h2 class="text-2xl font-bold mb-6" style="font-family:'Cormorant Garamond',serif;color:#8B1A1A">Eventos Anteriores</h2>
+    <h2 class="text-2xl font-bold mb-6" style="font-family:var(--fonte-titulos);color:var(--cor-primaria)">Eventos Anteriores</h2>
     <div class="space-y-3">
         {% for e in eventos_passados %}
         <div class="bg-white rounded-lg shadow p-4 flex items-center gap-4 opacity-75">

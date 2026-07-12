@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Igreja Batista Independente Nova Vida - Rio Pardo/RS{% endblock %}</title>
-    <link rel="icon" type="image/png" href="/static/img/logo.png">
+    <link rel="icon" type="image/png" href="{{ cfg.logo_url | default('/static/img/logo.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -24,27 +24,37 @@
         }
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&family=Playfair+Display:wght@400;600;700&family=Merriweather:wght@300;400;700&family=Montserrat:wght@400;600;700&family=Poppins:wght@400;600;700&family=Open+Sans:wght@400;600;700&family=Roboto:wght@400;500;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Lato', sans-serif; background-color: #f5f3f0; color: #1a1a1a; }
-        h1, h2, h3, .serif { font-family: 'Cormorant Garamond', serif; }
+        :root {
+            --cor-primaria: {{ cfg.cor_primaria | default('#8B1A1A') }};
+            --cor-primaria-hover: {{ cfg.cor_primaria_hover | default('#6e1414') }};
+            --cor-escura: {{ cfg.cor_escura | default('#1a0a0a') }};
+            --cor-fundo: {{ cfg.cor_fundo | default('#f5f3f0') }};
+            --cor-destaque: {{ cfg.cor_destaque | default('#f0c0c0') }};
+            --fonte-titulos: {{ cfg.fonte_titulos | default("'Cormorant Garamond', serif") }};
+            --fonte-corpo: {{ cfg.fonte_corpo | default("'Lato', sans-serif") }};
+        }
+        body { font-family: var(--fonte-corpo); background-color: var(--cor-fundo); color: #1a1a1a; }
+        h1, h2, h3, .serif { font-family: var(--fonte-titulos); }
         .hero-bg {
-            background: linear-gradient(135deg, #1a0a0a 0%, #4a0f0f 50%, #8B1A1A 100%);
+            background: linear-gradient(135deg, var(--cor-escura) 0%, var(--cor-primaria) 100%);
         }
     </style>
     {% block extra_head %}{% endblock %}
 </head>
-<body class="text-gray-800" style="background-color:#f5f3f0">
+<body class="text-gray-800" style="background-color:var(--cor-fundo)">
 
-<nav style="background-color:#8B1A1A" class="text-white shadow-lg">
+<nav style="background-color:var(--cor-primaria)" class="text-white shadow-lg">
     <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
         <a href="/" class="flex items-center gap-3">
             <div class="rounded-full flex items-center justify-center" style="background:white;width:44px;height:44px;flex-shrink:0">
                 <img src="{{ cfg.logo_url | default('/static/img/logo.png') }}" alt="Logo" style="width:54px;height:54px;object-fit:contain" onerror="this.parentElement.style.display='none'">
             </div>
             <div>
-                <div class="text-base font-bold leading-tight tracking-wide" style="font-family:'Cormorant Garamond',serif;font-size:1.1rem">{{ cfg.nome_igreja | default('Igreja Batista Independente Nova Vida') }}</div>
-                <div class="text-xs" style="color:#f0c0c0;letter-spacing:0.15em">{{ cfg.sigla_igreja | default('IBINOVI') }} – {{ cfg.cidade_estado | default('RIO PARDO/RS') }}</div>
+                <div class="text-base font-bold leading-tight tracking-wide" style="font-family:var(--fonte-titulos);font-size:1.1rem">{{ cfg.nome_igreja | default('Igreja Batista Independente Nova Vida') }}</div>
+                <div class="text-xs" style="color:var(--cor-destaque);letter-spacing:0.15em">{{ cfg.sigla_igreja | default('IBINOVI') }} – {{ cfg.cidade_estado | default('RIO PARDO/RS') }}</div>
             </div>
         </a>
         <div class="hidden md:flex gap-7 text-sm font-medium tracking-widest uppercase">
@@ -61,7 +71,7 @@
             </svg>
         </button>
     </div>
-    <div id="mobile-menu" class="hidden md:hidden px-4 pb-4 flex flex-col gap-3 text-sm" style="background-color:#6e1414">
+    <div id="mobile-menu" class="hidden md:hidden px-4 pb-4 flex flex-col gap-3 text-sm" style="background-color:var(--cor-primaria-hover)">
         <a href="/" class="hover:text-red-200">Início</a>
         <a href="/sobre" class="hover:text-red-200">Sobre</a>
         <a href="/cultos" class="hover:text-red-200">Cultos</a>
@@ -73,12 +83,12 @@
 
 {% block content %}{% endblock %}
 
-<footer class="text-sm mt-16 py-10" style="background-color:#1a0a0a;color:#c9b8b8">
+<footer class="text-sm mt-16 py-10" style="background-color:var(--cor-escura);color:#c9b8b8">
     <div class="max-w-6xl mx-auto px-4">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             <div>
-                <p class="font-semibold text-white mb-2" style="font-family:'Cormorant Garamond',serif;font-size:1.1rem">{{ cfg.nome_igreja | default('Igreja Batista Independente Nova Vida') }}</p>
-                <p class="text-xs" style="color:#f0c0c0;letter-spacing:0.12em">{{ cfg.sigla_igreja | default('IBINOVI') }} – {{ cfg.cidade_estado | default('RIO PARDO/RS') }}</p>
+                <p class="font-semibold text-white mb-2" style="font-family:var(--fonte-titulos);font-size:1.1rem">{{ cfg.nome_igreja | default('Igreja Batista Independente Nova Vida') }}</p>
+                <p class="text-xs" style="color:var(--cor-destaque);letter-spacing:0.12em">{{ cfg.sigla_igreja | default('IBINOVI') }} – {{ cfg.cidade_estado | default('RIO PARDO/RS') }}</p>
             </div>
             <div>
                 <p class="font-semibold text-white mb-2 uppercase tracking-widest text-xs">Endereço</p>
@@ -93,7 +103,7 @@
                 <a href="mailto:{{ cfg.email | default('ibnvriopardo@gmail.com') }}" class="text-xs hover:text-white block">✉️ {{ cfg.email | default('ibnvriopardo@gmail.com') }}</a>
             </div>
         </div>
-        <div class="pt-4 text-center" style="border-top:1px solid #3a1a1a">
+        <div class="pt-4 text-center" style="border-top:1px solid rgba(255,255,255,0.1)">
             <p class="text-xs" style="color:#7a5a5a">&copy; 2026 {{ cfg.sigla_igreja | default('IBINOVI') }} – {{ cfg.nome_igreja | default('Igreja Batista Independente Nova Vida') }}. Todos os direitos reservados.</p>
             <a href="/admin/login" class="text-xs hover:text-white mt-2 inline-block" style="color:#3a2a2a">Área Administrativa</a>
         </div>

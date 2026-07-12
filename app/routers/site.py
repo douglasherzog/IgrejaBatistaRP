@@ -79,6 +79,19 @@ SECOES = {
             ("maps_embed", "Google Maps - URL do embed (src do iframe)", "textarea", "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3473.2!2d-52.3864082!3d-29.983285!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x951b5d32bfce9c5b%3A0xcf1e16321d0d8a49!2sIgreja%20Batista%20Nova%20Vida!5e0!3m2!1spt!2sbr!4v1", "Cole aqui a URL do embed do Google Maps. Para obter: vá no Google Maps > Compartilhar > Incorporar mapa > copie o conteúdo do src do iframe."),
         ],
     },
+    "Aparência": {
+        "icon": "🎨",
+        "campos": [
+            ("cor_primaria", "Cor Primária", "color", "#8B1A1A", "Cor principal da igreja. Usada na barra de navegação, botões, títulos e detalhes. Clique para escolher uma cor."),
+            ("cor_primaria_hover", "Cor ao Passar o Mouse", "color", "#6e1414", "Cor dos botões e links quando o mouse passa por cima. Geralmente uma versão mais escura da cor primária."),
+            ("cor_escura", "Cor Escura (Fundo)", "color", "#1a0a0a", "Cor de fundo escura, usada no rodapé e na seção do versículo."),
+            ("cor_fundo", "Cor de Fundo do Site", "color", "#f5f3f0", "Cor de fundo geral das páginas. Geralmente um tom claro neutro."),
+            ("cor_destaque", "Cor de Destaque (Textos)", "color", "#f0c0c0", "Cor de destaque para textos secundários no hero e rodapé. Geralmente um tom claro da cor primária."),
+            ("fonte_titulos", "Fonte dos Títulos", "select", "'Cormorant Garamond', serif", "Fonte usada em todos os títulos do site.", ["'Cormorant Garamond', serif", "'Playfair Display', serif", "'Merriweather', serif", "'Montserrat', sans-serif", "'Poppins', sans-serif"]),
+            ("fonte_corpo", "Fonte do Texto", "select", "'Lato', sans-serif", "Fonte usada no texto geral do site.", ["'Lato', sans-serif", "'Open Sans', sans-serif", "'Roboto', sans-serif", "'Inter', sans-serif"]),
+            ("hero_imagem", "Imagem de Fundo do Hero (URL)", "text", "/static/img/hero.jpg", "URL da imagem de fundo da página inicial. Para enviar uma nova imagem, use o upload abaixo."),
+        ],
+    },
 }
 
 
@@ -216,3 +229,23 @@ async def upload_logo(
     set_config(db, "logo_url", logo_url)
     db.commit()
     return RedirectResponse(url="/admin/site?ok=1#geral", status_code=302)
+
+
+@router.post("/admin/site/upload-hero")
+async def upload_hero(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    admin: Admin = Depends(get_admin_atual)
+):
+    upload_dir = os.path.join("static", "img")
+    os.makedirs(upload_dir, exist_ok=True)
+    ext = os.path.splitext(file.filename or "hero.jpg")[1] or ".jpg"
+    if ext.lower() not in (".png", ".jpg", ".jpeg", ".gif", ".webp"):
+        ext = ".jpg"
+    dest = os.path.join(upload_dir, "hero" + ext)
+    with open(dest, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    hero_url = f"/static/img/hero{ext}"
+    set_config(db, "hero_imagem", hero_url)
+    db.commit()
+    return RedirectResponse(url="/admin/site?ok=1#aparencia", status_code=302)

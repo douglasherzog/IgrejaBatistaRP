@@ -40,11 +40,26 @@
             {% set tipo = campo[2] %}
             {% set default = campo[3] %}
             {% set ajuda = campo[4] %}
-            <div class="{% if tipo == 'textarea' %}md:col-span-2{% endif %}">
+            <div class="{% if tipo == 'textarea' or tipo == 'select' %}md:col-span-2{% endif %}">
                 <label class="block text-xs font-medium text-gray-600 mb-1">{{ label }}</label>
                 {% if tipo == 'textarea' %}
                 <textarea name="cfg_{{ chave }}" rows="3"
                     class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">{{ configs.get(chave, default) }}</textarea>
+                {% elif tipo == 'color' %}
+                <div class="flex items-center gap-3">
+                    <input type="color" name="cfg_{{ chave }}" value="{{ configs.get(chave, default) }}"
+                        class="border rounded-lg cursor-pointer" style="width:48px;height:40px">
+                    <input type="text" value="{{ configs.get(chave, default) }}" readonly
+                        class="border rounded-lg px-3 py-2 text-sm bg-gray-50" style="width:120px">
+                </div>
+                {% elif tipo == 'select' %}
+                {% set opcoes = campo[5] if campo|length > 5 else [] %}
+                <select name="cfg_{{ chave }}"
+                    class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    {% for op in opcoes %}
+                    <option value="{{ op }}" {% if configs.get(chave, default) == op %}selected{% endif %}>{{ op.split(',')[0].strip().strip("'") }}</option>
+                    {% endfor %}
+                </select>
                 {% else %}
                 <input type="text" name="cfg_{{ chave }}"
                     value="{{ configs.get(chave, default) }}"
@@ -65,6 +80,22 @@
                             class="text-sm text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-900 file:text-white hover:file:bg-blue-800 file:cursor-pointer">
                         <p class="text-xs text-gray-400 mt-1">💡 Selecione um arquivo de imagem (PNG, JPG, GIF, WebP ou SVG). A imagem substituirá o logo atual no site.</p>
                         <button type="submit" class="mt-2 bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition">📤 Enviar Logo</button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+            {% if nome_secao == 'Aparência' %}
+            <div class="md:col-span-2 mt-2 pt-4 border-t">
+                <label class="block text-xs font-medium text-gray-600 mb-2">🖼️ Enviar nova imagem de fundo do Hero</label>
+                <div class="flex items-start gap-4">
+                    <div class="rounded-lg overflow-hidden border bg-gray-100" style="width:160px;height:90px;flex-shrink:0">
+                        <img src="{{ configs.get('hero_imagem', '/static/img/hero.jpg') }}" alt="Hero atual" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.style.display='none'">
+                    </div>
+                    <form method="post" action="/admin/site/upload-hero" enctype="multipart/form-data" class="flex-1">
+                        <input type="file" name="file" accept="image/png,image/jpeg,image/gif,image/webp"
+                            class="text-sm text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-900 file:text-white hover:file:bg-blue-800 file:cursor-pointer">
+                        <p class="text-xs text-gray-400 mt-1">💡 Selecione uma imagem de fundo para a página inicial (PNG, JPG, GIF ou WebP). Recomenda-se uma imagem ampla e de boa qualidade (ex: 1920x1080). A imagem receberá um escurecimento automático para melhorar a leitura do texto.</p>
+                        <button type="submit" class="mt-2 bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition">📤 Enviar Imagem de Fundo</button>
                     </form>
                 </div>
             </div>
