@@ -34,7 +34,12 @@
     <div id="secao-{{ nome_secao }}" class="secao bg-white rounded-xl shadow p-6 {% if not loop.first %}hidden{% endif %}">
         <h2 class="text-lg font-bold text-gray-800 mb-4">{{ dados.icon }} {{ nome_secao }}</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {% for chave, label, tipo, default in dados.campos %}
+            {% for campo in dados.campos %}
+            {% set chave = campo[0] %}
+            {% set label = campo[1] %}
+            {% set tipo = campo[2] %}
+            {% set default = campo[3] %}
+            {% set ajuda = campo[4] %}
             <div class="{% if tipo == 'textarea' %}md:col-span-2{% endif %}">
                 <label class="block text-xs font-medium text-gray-600 mb-1">{{ label }}</label>
                 {% if tipo == 'textarea' %}
@@ -45,6 +50,7 @@
                     value="{{ configs.get(chave, default) }}"
                     class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                 {% endif %}
+                {% if ajuda %}<p class="text-xs text-gray-400 mt-1">💡 {{ ajuda }}</p>{% endif %}
             </div>
             {% endfor %}
         </div>
@@ -53,9 +59,10 @@
 
     <!-- Seção Cultos -->
     <div id="secao-Cultos" class="secao bg-white rounded-xl shadow p-6 hidden">
-        <div class="flex justify-between items-center mb-4">
+        <div class="flex justify-between items-center mb-2">
             <h2 class="text-lg font-bold text-gray-800">🕐 Cultos e Horários</h2>
         </div>
+        <p class="text-xs text-gray-400 mb-4">💡 Cadastre os cultos semanais da igreja. Eles aparecem na página "Cultos" do site. Use "Destaque" para o culto principal (geralmente o de domingo).</p>
 
         <!-- Lista de cultos existentes -->
         <div class="space-y-3 mb-6">
@@ -71,27 +78,36 @@
                     <div>
                         <label class="block text-xs text-gray-500 mb-1">Dia da semana</label>
                         <input type="text" name="dia_semana" value="{{ c.dia_semana }}"
+                            placeholder="Ex: Domingo"
                             class="w-full border rounded-lg px-3 py-2 text-sm">
+                        <p class="text-xs text-gray-400 mt-1">💡 Ex: Domingo, Terça-feira...</p>
                     </div>
                     <div>
                         <label class="block text-xs text-gray-500 mb-1">Horário</label>
                         <input type="text" name="horario" value="{{ c.horario }}"
+                            placeholder="Ex: 19h00"
                             class="w-full border rounded-lg px-3 py-2 text-sm">
+                        <p class="text-xs text-gray-400 mt-1">💡 Ex: 19h00, 15h00...</p>
                     </div>
                     <div>
                         <label class="block text-xs text-gray-500 mb-1">Nome</label>
                         <input type="text" name="nome" value="{{ c.nome }}"
+                            placeholder="Ex: Culto de Celebração"
                             class="w-full border rounded-lg px-3 py-2 text-sm">
+                        <p class="text-xs text-gray-400 mt-1">💡 Nome do culto.</p>
                     </div>
                     <div class="md:col-span-2">
                         <label class="block text-xs text-gray-500 mb-1">Descrição (opcional)</label>
                         <input type="text" name="descricao" value="{{ c.descricao or '' }}"
+                            placeholder="Ex: Na casa do Irmão Tiago"
                             class="w-full border rounded-lg px-3 py-2 text-sm">
+                        <p class="text-xs text-gray-400 mt-1">💡 Informação adicional sobre o local ou observação.</p>
                     </div>
                     <div>
                         <label class="block text-xs text-gray-500 mb-1">Ordem</label>
                         <input type="number" name="ordem" value="{{ c.ordem }}"
                             class="w-full border rounded-lg px-3 py-2 text-sm">
+                        <p class="text-xs text-gray-400 mt-1">💡 Define a ordem de exibição. Menor número aparece primeiro.</p>
                     </div>
                     <div class="flex items-center gap-4 pt-6">
                         <label class="flex items-center gap-2 text-sm">

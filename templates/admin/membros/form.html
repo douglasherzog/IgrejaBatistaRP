@@ -6,6 +6,7 @@
     <h1 class="text-2xl font-bold text-blue-900 mt-1">
         {% if membro %}Editar Membro{% else %}Novo Membro{% endif %}
     </h1>
+    <p class="text-sm text-gray-500 mt-1">Preencha os dados do membro. Os campos com * são obrigatórios.</p>
 </div>
 
 <form method="post" action="{% if membro %}/admin/membros/{{ membro.id }}/editar{% else %}/admin/membros/novo{% endif %}"
@@ -14,39 +15,51 @@
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Nome *</label>
             <input type="text" name="nome" required value="{{ membro.nome if membro else '' }}"
+                placeholder="Ex: João"
                 class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <p class="text-xs text-gray-400 mt-1">💡 Primeiro nome do membro.</p>
         </div>
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Sobrenome *</label>
             <input type="text" name="sobrenome" required value="{{ membro.sobrenome if membro else '' }}"
+                placeholder="Ex: Silva"
                 class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <p class="text-xs text-gray-400 mt-1">💡 Restante do nome completo.</p>
         </div>
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Data de Nascimento</label>
             <input type="date" name="data_nascimento"
                 value="{{ membro.data_nascimento.isoformat() if membro and membro.data_nascimento else '' }}"
                 class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <p class="text-xs text-gray-400 mt-1">💡 Data em que o membro nasceu. Opcional.</p>
         </div>
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Data de Batismo</label>
             <input type="date" name="data_batismo"
                 value="{{ membro.data_batismo.isoformat() if membro and membro.data_batismo else '' }}"
                 class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <p class="text-xs text-gray-400 mt-1">💡 Data em que o membro foi batizado. Opcional.</p>
         </div>
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Telefone</label>
             <input type="tel" name="telefone" value="{{ membro.telefone or '' if membro else '' }}"
+                placeholder="Ex: (51) 99999-9999"
                 class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <p class="text-xs text-gray-400 mt-1">💡 Telefone ou WhatsApp para contato.</p>
         </div>
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
             <input type="email" name="email" value="{{ membro.email or '' if membro else '' }}"
+                placeholder="Ex: joao@email.com"
                 class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <p class="text-xs text-gray-400 mt-1">💡 Endereço de e-mail do membro.</p>
         </div>
         <div class="md:col-span-2">
             <label class="block text-sm font-medium text-gray-700 mb-1">Endereço</label>
             <input type="text" name="endereco" value="{{ membro.endereco or '' if membro else '' }}"
+                placeholder="Ex: Rua das Flores, 123"
                 class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <p class="text-xs text-gray-400 mt-1">💡 Rua e número da residência do membro.</p>
         </div>
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Bairro</label>
@@ -71,7 +84,9 @@
         <div class="md:col-span-2">
             <label class="block text-sm font-medium text-gray-700 mb-1">Observações</label>
             <textarea name="observacoes" rows="3"
+                placeholder="Ex: Membro atuante no ministério de louvor..."
                 class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">{{ membro.observacoes or '' if membro else '' }}</textarea>
+            <p class="text-xs text-gray-400 mt-1">💡 Anotações gerais sobre o membro: ministérios, funções, observações importantes.</p>
         </div>
     </div>
     <div class="flex gap-3 mt-6">

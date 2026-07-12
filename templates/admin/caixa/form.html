@@ -6,6 +6,7 @@
     <h1 class="text-2xl font-bold text-blue-900 mt-1">
         {% if lancamento %}Editar Lançamento{% else %}Novo Lançamento{% endif %}
     </h1>
+    <p class="text-sm text-gray-500 mt-1">Registre entradas e saídas do caixa da igreja. Os campos com * são obrigatórios.</p>
 </div>
 
 <form method="post"
@@ -20,6 +21,7 @@
                 <option value="receita" {% if tipo_pre == 'receita' %}selected{% endif %}>Receita</option>
                 <option value="despesa" {% if tipo_pre == 'despesa' %}selected{% endif %}>Despesa</option>
             </select>
+            <p class="text-xs text-gray-400 mt-1">💡 <strong>Receita</strong>: dinheiro que entra (dízimos, ofertas, doações). <strong>Despesa</strong>: dinheiro que sai (contas, materiais, manutenção).</p>
         </div>
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Categoria *</label>
@@ -33,24 +35,30 @@
                 <option value="{{ c }}" data-tipo="despesa" {% if c == cat_atual %}selected{% endif %}>{{ c }}</option>
                 {% endfor %}
             </select>
+            <p class="text-xs text-gray-400 mt-1">💡 Classifique o lançamento. Ex: Dízimo, Oferta, Conta de Luz, Material de Limpeza.</p>
         </div>
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Descrição *</label>
             <input type="text" name="descricao" required
                 value="{{ lancamento.descricao if lancamento else '' }}"
+                placeholder="Ex: Dízimo do culto de domingo"
                 class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <p class="text-xs text-gray-400 mt-1">💡 Descreva brevemente o motivo do lançamento.</p>
         </div>
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Valor (R$) *</label>
             <input type="number" name="valor" step="0.01" min="0.01" required
                 value="{{ lancamento.valor if lancamento else '' }}"
+                placeholder="Ex: 150.00"
                 class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <p class="text-xs text-gray-400 mt-1">💡 Valor em reais. Use ponto para separar os centavos. Ex: 150.00</p>
         </div>
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Data *</label>
             <input type="date" name="data" required
                 value="{{ lancamento.data.isoformat() if lancamento else '' }}"
                 class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <p class="text-xs text-gray-400 mt-1">💡 Data em que o lançamento ocorreu (dia do dízimo, pagamento da conta, etc).</p>
         </div>
         <div id="campo-dizimista" style="display:none">
             <label class="block text-sm font-medium text-gray-700 mb-1">Dizimista (Membro) *</label>
@@ -63,11 +71,14 @@
                 </option>
                 {% endfor %}
             </select>
+            <p class="text-xs text-gray-400 mt-1">💡 Selecione qual membro entregou o dízimo. Este campo aparece apenas quando a categoria é Dízimo.</p>
         </div>
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Observações</label>
             <textarea name="observacoes" rows="3"
+                placeholder="Ex: Pagamento referente ao mês de janeiro..."
                 class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">{{ lancamento.observacoes or '' if lancamento else '' }}</textarea>
+            <p class="text-xs text-gray-400 mt-1">💡 Anotações extras sobre o lançamento. Opcional.</p>
         </div>
     </div>
 

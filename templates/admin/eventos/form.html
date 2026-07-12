@@ -1,0 +1,101 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}{{ 'Editar Evento' if evento else 'Novo Evento' }}{% endblock %}
+{% block content %}
+<div class="mb-6">
+    <a href="/admin/eventos" class="text-sm text-blue-600 hover:underline">← Voltar para Eventos</a>
+    <h1 class="text-2xl font-bold text-blue-900 mt-1">{{ '✏️ Editar Evento' if evento else '📅 Novo Evento' }}</h1>
+    <p class="text-sm text-gray-500 mt-1">Preencha as informações do evento abaixo. Os campos com * são obrigatórios.</p>
+</div>
+
+<form method="post"
+    action="{% if evento %}/admin/eventos/{{ evento.id }}/editar{% else %}/admin/eventos/novo{% endif %}"
+    class="bg-white rounded-xl shadow p-8 max-w-2xl space-y-5">
+
+    <!-- Título -->
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Título do Evento *</label>
+        <input type="text" name="titulo" required value="{{ evento.titulo if evento else '' }}"
+            placeholder="Ex: Conferência de Missões 2026"
+            class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <p class="text-xs text-gray-400 mt-1">💡 Escreva um nome claro e chamativo. Será exibido em destaque na página de eventos.</p>
+    </div>
+
+    <!-- Descrição -->
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
+        <textarea name="descricao" rows="4"
+            placeholder="Ex: Uma noite especial de adoração e pregação da Palavra com o Pr. João Silva..."
+            class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">{{ evento.descricao if evento else '' }}</textarea>
+        <p class="text-xs text-gray-400 mt-1">💡 Descreva o evento: tema, preletor, atividades, público-alvo, etc. Quanto mais detalhes, melhor.</p>
+    </div>
+
+    <!-- Data e Horário -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Data do Evento *</label>
+            <input type="date" name="data" required
+                value="{{ evento.data.strftime('%Y-%m-%d') if evento else '' }}"
+                class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <p class="text-xs text-gray-400 mt-1">💡 Selecione a data em que o evento vai acontecer.</p>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Horário</label>
+            <input type="text" name="horario"
+                value="{{ evento.horario if evento else '' }}"
+                placeholder="Ex: 19h30"
+                class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <p class="text-xs text-gray-400 mt-1">💡 Informe o horário de início. Ex: "19h30" ou "09h00 às 12h00".</p>
+        </div>
+    </div>
+
+    <!-- Local -->
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Local</label>
+        <input type="text" name="local"
+            value="{{ evento.local if evento else '' }}"
+            placeholder="Ex: Templo da IBINOVI"
+            class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <p class="text-xs text-gray-400 mt-1">💡 Onde o evento será realizado. Se for na igreja, escreva "Templo da IBINOVI". Se for em outro lugar, informe o endereço.</p>
+    </div>
+
+    <!-- Imagem -->
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">URL da Imagem (opcional)</label>
+        <input type="text" name="imagem_url"
+            value="{{ evento.imagem_url if evento else '' }}"
+            placeholder="Ex: https://exemplo.com/imagem.jpg"
+            class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <p class="text-xs text-gray-400 mt-1">💡 Cole o link (URL) de uma imagem para ilustrar o evento. A imagem deve estar hospedada na internet (ex: Imgur, Google Drive público). Deixe em branco se não tiver imagem.</p>
+    </div>
+
+    <!-- Opções -->
+    <div class="flex flex-col gap-3 pt-2 border-t">
+        <label class="flex items-center gap-3 text-sm text-gray-700">
+            <input type="checkbox" name="destaque" {% if evento and evento.destaque %}checked{% endif %} class="rounded">
+            <div>
+                <span class="font-medium">⭐ Marcar como destaque</span>
+                <p class="text-xs text-gray-400">Eventos em destaque aparecem em primeiro lugar na página pública.</p>
+            </div>
+        </label>
+        <label class="flex items-center gap-3 text-sm text-gray-700">
+            <input type="checkbox" name="ativo" {% if not evento or evento.ativo %}checked{% endif %} class="rounded">
+            <div>
+                <span class="font-medium">✅ Evento ativo</span>
+                <p class="text-xs text-gray-400">Se desmarcado, o evento não aparece na página pública, mas continua salvo no sistema.</p>
+            </div>
+        </label>
+    </div>
+
+    <!-- Botões -->
+    <div class="flex gap-3 pt-4">
+        <button type="submit"
+            class="bg-blue-900 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-blue-800 transition">
+            💾 {{ 'Salvar Alterações' if evento else 'Criar Evento' }}
+        </button>
+        <a href="/admin/eventos"
+            class="bg-gray-100 text-gray-600 px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-200 transition">
+            Cancelar
+        </a>
+    </div>
+</form>
+{% endblock %}

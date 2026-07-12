@@ -79,3 +79,19 @@ class Culto(Base):
     ativo = Column(Boolean, default=True)
     criado_em = Column(DateTime, server_default=func.now())
     atualizado_em = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+
+class Evento(Base):
+    __tablename__ = "eventos"
+
+    id = Column(Integer, primary_key=True, index=True)
+    titulo = Column(String(200), nullable=False)
+    descricao = Column(Text, nullable=True)
+    data = Column(Date, nullable=False)
+    horario = Column(String(20), nullable=True)
+    local = Column(String(255), nullable=True)
+    imagem_url = Column(String(500), nullable=True)
+    destaque = Column(Boolean, default=False)
+    ativo = Column(Boolean, default=True)
+    criado_em = Column(DateTime, server_default=func.now())
+    atualizado_em = Column(DateTime, server_default=func.now(), onupdate=func.now())
