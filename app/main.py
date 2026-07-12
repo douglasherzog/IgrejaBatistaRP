@@ -3,7 +3,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.base import BaseHTTPMiddleware
 from app.database import engine, Base, SessionLocal
-from app.routers import publico, auth, membros, caixa, admin_dashboard, site, eventos, videos, oracao, inscricoes, fotos, relatorios
+from app.routers import publico, auth, membros, caixa, admin_dashboard, site, eventos, videos, oracao, inscricoes, fotos, relatorios, importar
 from app.routers.site import get_all_configs
 
 Base.metadata.create_all(bind=engine)
@@ -45,3 +45,4 @@ app.include_router(oracao.router)
 app.include_router(inscricoes.router)
 app.include_router(fotos.router)
 app.include_router(relatorios.router)
+app.include_router(importar.router)

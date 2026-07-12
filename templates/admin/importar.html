@@ -1,0 +1,200 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Importar Dados{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h1 class="text-2xl font-bold text-blue-900">📥 Importar Dados</h1>
+        <p class="text-gray-500 text-sm">Importe membros e lançamentos de uma planilha</p>
+    </div>
+    <div class="flex gap-2">
+        <a href="/admin/dashboard" class="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition text-sm font-medium">
+            ← Voltar
+        </a>
+    </div>
+</div>
+
+<!-- Instruções -->
+<div class="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-6">
+    <h2 class="text-lg font-bold text-blue-900 mb-4">📋 Instruções de Importação</h2>
+    
+    <div class="space-y-4 text-sm">
+        <div>
+            <h3 class="font-semibold text-blue-800 mb-2">Formatos Aceitos:</h3>
+            <ul class="list-disc list-inside space-y-1 text-blue-700">
+                <li>Excel (.xlsx, .xls)</li>
+                <li>CSV (separado por vírgula)</li>
+            </ul>
+        </div>
+        
+        <div>
+            <h3 class="font-semibold text-blue-800 mb-2">Para Membros:</h3>
+            <p class="text-blue-700 mb-2">Sua planilha deve conter as seguintes colunas (nomes podem variar):</p>
+            <ul class="list-disc list-inside space-y-1 text-blue-700">
+                <li><strong>Nome</strong> (obrigatório)</li>
+                <li>Sobrenome</li>
+                <li>Telefone</li>
+                <li>Email</li>
+                <li>Data Nascimento (formato: DD/MM/YYYY ou YYYY-MM-DD)</li>
+                <li>Data Batismo (formato: DD/MM/YYYY ou YYYY-MM-DD)</li>
+                <li>Endereço</li>
+                <li>Bairro</li>
+                <li>Cidade</li>
+                <li>Estado</li>
+                <li>CEP</li>
+                <li>Observações</li>
+            </ul>
+        </div>
+        
+        <div>
+            <h3 class="font-semibold text-blue-800 mb-2">Para Lançamentos Financeiros:</h3>
+            <p class="text-blue-700 mb-2">Sua planilha deve conter as seguintes colunas:</p>
+            <ul class="list-disc list-inside space-y-1 text-blue-700">
+                <li><strong>Data</strong> (obrigatório - formato: DD/MM/YYYY ou YYYY-MM-DD)</li>
+                <li><strong>Valor</strong> (obrigatório - pode ser R$ 100,00 ou 100,00)</li>
+                <li>Descrição</li>
+                <li>Categoria</li>
+                <li>Tipo (receita/despesa - opcional, será inferido pela categoria)</li>
+                <li>Membro/Dizimista (nome completo do membro)</li>
+            </ul>
+        </div>
+        
+        <div class="bg-yellow-100 border border-yellow-300 rounded-lg p-3">
+            <p class="text-yellow-800 text-xs">
+                <strong>⚠️ Importante:</strong> O sistema detectará automaticamente se sua planilha contém dados de membros ou lançamentos. 
+                Membros duplicados não serão importados. Verifique o resultado após a importação.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Formulário de Upload -->
+<div class="bg-white rounded-xl shadow p-6">
+    <h2 class="text-lg font-bold text-gray-800 mb-4">📤 Enviar Arquivo</h2>
+    
+    {% if sucesso %}
+    <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+        <h3 class="font-semibold text-green-800 mb-2">✅ Importação Concluída!</h3>
+        <div class="text-sm text-green-700">
+            <p><strong>Membros importados:</strong> {{ resultado.membros_importados }}</p>
+            <p><strong>Lançamentos importados:</strong> {{ resultado.lancamentos_importados }}</p>
+            {% if resultado.warnings %}
+            <div class="mt-2">
+                <p class="font-semibold">Avisos:</p>
+                <ul class="list-disc list-inside">
+                    {% for warning in resultado.warnings %}
+                    <li>{{ warning }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if erro %}
+    <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+        <h3 class="font-semibold text-red-800 mb-2">❌ Erro na Importação</h3>
+        <p class="text-sm text-red-700">{{ erro }}</p>
+    </div>
+    {% endif %}
+    
+    {% if resultado and resultado.erros %}
+    <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+        <h3 class="font-semibold text-red-800 mb-2">❌ Erros Encontrados</h3>
+        <ul class="list-disc list-inside text-sm text-red-700">
+            {% for erro in resultado.erros %}
+            <li>{{ erro }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    
+    <form method="post" enctype="multipart/form-data" class="space-y-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Selecione o Arquivo</label>
+            <input type="file" name="arquivo" accept=".xlsx,.xls,.csv" required
+                class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <p class="text-xs text-gray-500 mt-1">Apenas arquivos Excel (.xlsx, .xls) ou CSV</p>
+        </div>
+        
+        <div class="flex gap-2">
+            <button type="submit" class="bg-blue-900 text-white px-6 py-2 rounded-lg text-sm hover:bg-blue-800 transition">
+                📥 Importar Dados
+            </button>
+            <a href="/admin/dashboard" class="border border-gray-300 px-6 py-2 rounded-lg text-sm hover:bg-gray-50 transition">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Exemplos -->
+<div class="bg-gray-50 rounded-xl p-6 mt-6">
+    <h2 class="text-lg font-bold text-gray-800 mb-4">📝 Exemplos de Formato</h2>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div>
+            <h3 class="font-semibold text-gray-700 mb-2">Exemplo - Membros:</h3>
+            <div class="bg-white border rounded-lg p-3 text-xs font-mono overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b">
+                            <th class="text-left p-1">Nome</th>
+                            <th class="text-left p-1">Telefone</th>
+                            <th class="text-left p-1">Email</th>
+                            <th class="text-left p-1">Data Nascimento</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b">
+                            <td class="p-1">João</td>
+                            <td class="p-1">(51) 99999-8888</td>
+                            <td class="p-1">joao@email.com</td>
+                            <td class="p-1">15/03/1985</td>
+                        </tr>
+                        <tr>
+                            <td class="p-1">Maria</td>
+                            <td class="p-1">(51) 97777-6666</td>
+                            <td class="p-1">maria@email.com</td>
+                            <td class="p-1">22/07/1990</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div>
+            <h3 class="font-semibold text-gray-700 mb-2">Exemplo - Lançamentos:</h3>
+            <div class="bg-white border rounded-lg p-3 text-xs font-mono overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b">
+                            <th class="text-left p-1">Data</th>
+                            <th class="text-left p-1">Descrição</th>
+                            <th class="text-left p-1">Categoria</th>
+                            <th class="text-left p-1">Valor</th>
+                            <th class="text-left p-1">Membro</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b">
+                            <td class="p-1">01/01/2026</td>
+                            <td class="p-1">Dízimo Janeiro</td>
+                            <td class="p-1">Dízimo</td>
+                            <td class="p-1">200,00</td>
+                            <td class="p-1">João Silva</td>
+                        </tr>
+                        <tr>
+                            <td class="p-1">05/01/2026</td>
+                            <td class="p-1">Oferta Especial</td>
+                            <td class="p-1">Oferta</td>
+                            <td class="p-1">100,00</td>
+                            <td class="p-1">Maria Santos</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
