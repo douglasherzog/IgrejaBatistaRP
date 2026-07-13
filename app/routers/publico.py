@@ -1,11 +1,15 @@
-from fastapi import APIRouter, Request, Depends
-from fastapi.responses import HTMLResponse
+from typing import Optional
+from fastapi import APIRouter, Request, Depends, Form
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from datetime import date
+from decimal import Decimal, InvalidOperation
 from app.database import get_db
-from app.models import ConfiguracaoSite, Culto, Evento, Video
+from app.models import ConfiguracaoSite, Culto, Evento, Video, Contribuicao, Admin
 from app.routers.site import get_all_configs
+from app.auth import get_admin_atual
+from app.security import csrf_valid
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -85,4 +89,71 @@ def videos(request: Request, db: Session = Depends(get_db)):
         "cfg": configs,
         "video_destaque": video_destaque,
         "outros_videos": outros,
+    })
+
+
+@router.get("/contribuicoes", response_class=HTMLResponse)
+def contribuicoes(request: Request, db: Session = Depends(get_db)):
+    configs = get_all_configs(db)
+    return templates.TemplateResponse("publico/contribuicoes.html", {
+        "request": request,
+        "cfg": configs,
+    })
+
+
+@router.post("/contribuicoes")
+async def salvar_contribuicao(
+    request: Request,
+    db: Session = Depends(get_db),
+    csrf_ok: bool = Depends(csrf_valid),
+    nome: str = Form(...),
+    email: Optional[str] = Form(None),
+    telefone: Optional[str] = Form(None),
+    valor: Optional[str] = Form(None),
+    mensagem: Optional[str] = Form(None),
+):
+    email = email.strip() if email else None
+    telefone = telefone.strip() if telefone else None
+    mensagem = mensagem.strip() if mensagem else None
+    valor_str = valor.strip() if valor else None
+
+    valor_decimal = None
+    if valor_str:
+        try:
+            valor_decimal = Decimal(valor_str.replace(".", "").replace(",", "."))
+        except (InvalidOperation, ValueError):
+            pass
+
+    nome = nome.strip()
+    if not nome:
+        return templates.TemplateResponse("publico/contribuicoes.html", {
+            "request": request,
+            "cfg": get_all_configs(db),
+            "erro": "Por favor, informe seu nome."
+        }, status_code=400)
+
+    contribuicao = Contribuicao(
+        nome=nome,
+        email=email,
+        telefone=telefone,
+        valor=valor_decimal,
+        mensagem=mensagem,
+        status="pendente",
+    )
+    db.add(contribuicao)
+    db.commit()
+
+    return RedirectResponse(url="/contribuicoes?ok=1", status_code=302)
+
+
+@router.get("/admin/contribuicoes", response_class=HTMLResponse)
+def listar_contribuicoes(
+    request: Request,
+    db: Session = Depends(get_db),
+    admin: Admin = Depends(get_admin_atual)
+):
+    contribuicoes = db.query(Contribuicao).order_by(Contribuicao.criado_em.desc()).all()
+    return templates.TemplateResponse("admin/contribuicoes/lista.html", {
+        "request": request,
+        "contribuicoes": contribuicoes,
     })

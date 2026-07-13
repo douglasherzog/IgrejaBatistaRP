@@ -7,63 +7,295 @@
     <link rel="icon" type="image/png" href="/static/img/logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
-    <style>body { font-family: 'Lato', sans-serif; }</style>
+    <style>body { font-family: 'Lato', sans-serif; }
+        
+        /* Dark Mode Styles for Admin */
+        .dark-mode .bg-blue-900 {
+            background-color: #1e3a8a !important;
+        }
+        
+        .dark-mode .bg-blue-800 {
+            background-color: #1e40af !important;
+        }
+        
+        .dark-mode .bg-white {
+            background-color: #1f2937 !important;
+        }
+        
+        .dark-mode .bg-gray-50 {
+            background-color: #374151 !important;
+        }
+        
+        .dark-mode .bg-gray-100 {
+            background-color: #1f2937 !important;
+        }
+        
+        .dark-mode .text-gray-800 {
+            color: #f9fafb !important;
+        }
+        
+        .dark-mode .text-gray-600 {
+            color: #d1d5db !important;
+        }
+        
+        .dark-mode .text-gray-700 {
+            color: #e5e7eb !important;
+        }
+        
+        .dark-mode .text-gray-500 {
+            color: #9ca3af !important;
+        }
+        
+        .dark-mode .text-blue-900 {
+            color: #60a5fa !important;
+        }
+        
+        .dark-mode .border-gray-200 {
+            border-color: #4b5563 !important;
+        }
+        
+        .dark-mode .border-gray-300 {
+            border-color: #4b5563 !important;
+        }
+        
+        .dark-mode .border-blue-800 {
+            border-color: #1e40af !important;
+        }
+        
+        .dark-mode .hover\:bg-gray-100:hover {
+            background-color: #374151 !important;
+        }
+        
+        .dark-mode .hover\:bg-blue-800:hover {
+            background-color: #1e40af !important;
+        }
+        
+        .dark-mode .hover\:bg-gray-50:hover {
+            background-color: #374151 !important;
+        }
+        
+        .dark-mode input, 
+        .dark-mode textarea, 
+        .dark-mode select {
+            background-color: #374151 !important;
+            color: #f9fafb !important;
+            border-color: #4b5563 !important;
+        }
+        
+        .dark-mode .shadow-lg {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important;
+        }
+        
+        .dark-mode .shadow {
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.5) !important;
+        }
+        
+        .dark-mode .bg-green-50 {
+            background-color: #064e3b !important;
+        }
+        
+        .dark-mode .bg-green-100 {
+            background-color: #065f46 !important;
+        }
+        
+        .dark-mode .text-green-700 {
+            color: #34d399 !important;
+        }
+        
+        .dark-mode .text-green-600 {
+            color: #10b981 !important;
+        }
+        
+        .dark-mode .border-green-200 {
+            border-color: #047857 !important;
+        }
+        
+        .dark-mode .bg-red-50 {
+            background-color: #7f1d1d !important;
+        }
+        
+        .dark-mode .bg-red-100 {
+            background-color: #991b1b !important;
+        }
+        
+        .dark-mode .text-red-700 {
+            color: #f87171 !important;
+        }
+        
+        .dark-mode .text-red-600 {
+            color: #ef4444 !important;
+        }
+        
+        .dark-mode .border-red-200 {
+            border-color: #b91c1c !important;
+        }
+        
+        .dark-mode .bg-blue-50 {
+            background-color: #1e3a8a !important;
+        }
+        
+        .dark-mode .bg-blue-100 {
+            background-color: #1e40af !important;
+        }
+        
+        .dark-mode .text-blue-700 {
+            color: #60a5fa !important;
+        }
+        
+        .dark-mode .text-blue-600 {
+            color: #3b82f6 !important;
+        }
+        
+        .dark-mode .border-blue-200 {
+            border-color: #1e40af !important;
+        }
+        
+        /* Transição suave */
+        * {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+    </style>
+    <script>
+        // Menu hambúrguer para mobile
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            if (sidebar.classList.contains('translate-x-0')) {
+                sidebar.classList.remove('translate-x-0');
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            } else {
+                sidebar.classList.remove('-translate-x-full');
+                sidebar.classList.add('translate-x-0');
+                overlay.classList.remove('hidden');
+            }
+        }
+        
+        // Fechar sidebar ao clicar no overlay
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            sidebar.classList.remove('translate-x-0');
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('hidden');
+        }
+        
+        // Ajustar layout baseado no tamanho da tela
+        function adjustLayout() {
+            const sidebar = document.getElementById('sidebar');
+            const main = document.getElementById('main-content');
+            const isMobile = window.innerWidth < 768;
+            
+            if (isMobile) {
+                sidebar.classList.add('-translate-x-full');
+                sidebar.classList.remove('translate-x-0');
+                main.classList.remove('ml-64');
+                main.classList.add('ml-0');
+            } else {
+                sidebar.classList.remove('-translate-x-full');
+                sidebar.classList.add('translate-x-0');
+                sidebar.classList.remove('fixed');
+                main.classList.add('ml-64');
+                main.classList.remove('ml-0');
+            }
+        }
+        
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            adjustLayout();
+            window.addEventListener('resize', adjustLayout);
+        });
+    </script>
 </head>
 <body class="bg-gray-100 min-h-screen flex">
 
+<!-- Overlay para mobile -->
+<div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden md:hidden" onclick="closeSidebar()"></div>
+
 <!-- Sidebar -->
-<aside class="w-64 bg-blue-900 text-white min-h-screen flex flex-col fixed top-0 left-0 z-30">
+<aside id="sidebar" class="w-64 bg-blue-900 text-white h-screen flex flex-col fixed top-0 left-0 z-50 transform -translate-x-full md:translate-x-0 md:relative md:z-30 transition-transform duration-300 ease-in-out">
     <div class="px-6 py-6 border-b border-blue-800">
-        <p class="text-xs text-blue-300 uppercase tracking-widest mb-1">Administração</p>
-        <p class="font-bold text-sm leading-tight">Igreja Batista Independente Nova Vida</p>
-        <p class="text-blue-300 text-xs">IBINOVI – Rio Pardo/RS</p>
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-xs text-blue-300 uppercase tracking-widest mb-1">Administração</p>
+                <p class="font-bold text-sm leading-tight">Igreja Batista</p>
+                <p class="text-blue-300 text-xs">IBINOVI – Rio Pardo/RS</p>
+            </div>
+            <button onclick="toggleSidebar()" class="md:hidden text-blue-300 hover:text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
     </div>
-    <nav class="flex-1 px-4 py-6 space-y-1 text-sm">
+    <nav class="flex-1 px-4 py-6 space-y-1 text-sm overflow-y-auto">
         <a href="/admin/dashboard" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-800 transition {% if request.url.path == '/admin/dashboard' %}bg-blue-800{% endif %}">
-            <span>🏠</span> Dashboard
+            <span>🏠</span> <span>Dashboard</span>
         </a>
         <a href="/admin/membros" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-800 transition {% if '/admin/membros' in request.url.path %}bg-blue-800{% endif %}">
-            <span>👥</span> Membros
+            <span>👥</span> <span>Membros</span>
         </a>
         <a href="/admin/caixa" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-800 transition {% if '/admin/caixa' in request.url.path %}bg-blue-800{% endif %}">
-            <span>💰</span> Controle de Caixa
+            <span>💰</span> <span>Caixa</span>
         </a>
         <a href="/admin/eventos" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-800 transition {% if '/admin/eventos' in request.url.path %}bg-blue-800{% endif %}">
-            <span>📅</span> Eventos
+            <span>📅</span> <span>Eventos</span>
         </a>
         <a href="/admin/videos" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-800 transition {% if '/admin/videos' in request.url.path %}bg-blue-800{% endif %}">
-            <span>📺</span> Vídeos
+            <span>📺</span> <span>Vídeos</span>
         </a>
         <a href="/admin/fotos" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-800 transition {% if '/admin/fotos' in request.url.path %}bg-blue-800{% endif %}">
-            <span>📸</span> Galeria de Fotos
+            <span>📸</span> <span>Fotos</span>
         </a>
         <a href="/admin/oracao" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-800 transition {% if '/admin/oracao' in request.url.path %}bg-blue-800{% endif %}">
-            <span>🙏</span> Pedidos de Oração
+            <span>🙏</span> <span>Oração</span>
+        </a>
+        <a href="/admin/contribuicoes" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-800 transition {% if '/admin/contribuicoes' in request.url.path %}bg-blue-800{% endif %}">
+            <span>🌱</span> <span>Contribuições</span>
         </a>
         <a href="/admin/inscricoes" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-800 transition {% if '/admin/inscricoes' in request.url.path %}bg-blue-800{% endif %}">
-            <span>📋</span> Inscrições
+            <span>📋</span> <span>Inscrições</span>
         </a>
         <a href="/admin/importar" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-800 transition {% if '/admin/importar' in request.url.path %}bg-blue-800{% endif %}">
-            <span>📥</span> Importar Dados
+            <span>📥</span> <span>Importar</span>
         </a>
         <a href="/admin/relatorios/geral" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-800 transition {% if '/admin/relatorios' in request.url.path %}bg-blue-800{% endif %}">
-            <span>📊</span> Relatórios
+            <span>📊</span> <span>Relatórios</span>
+        </a>
+        <a href="/admin/notificacoes" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-800 transition {% if '/admin/notificacoes' in request.url.path %}bg-blue-800{% endif %}">
+            <span>📱</span> <span>Notificações</span>
         </a>
         <a href="/admin/site" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-800 transition {% if '/admin/site' in request.url.path %}bg-blue-800{% endif %}">
-            <span>⚙️</span> Configurar Site
+            <span>⚙️</span> <span>Configurar</span>
         </a>
     </nav>
-    <div class="px-4 py-4 border-t border-blue-800">
+    <div class="px-4 py-4 border-t border-blue-800 mt-auto">
         <a href="/admin/logout" class="flex items-center gap-2 text-sm text-blue-300 hover:text-white transition">
-            <span>🚪</span> Sair
+            <span>🚪</span> <span>Sair</span>
         </a>
     </div>
 </aside>
 
-<!-- Conteúdo -->
-<main class="flex-1 ml-64 p-8">
-    {% block content %}{% endblock %}
-</main>
+<!-- Conteúdo Principal -->
+<div class="flex-1 flex flex-col min-h-screen">
+    <!-- Header Mobile -->
+    <header class="bg-blue-900 text-white p-4 flex items-center justify-between md:hidden">
+        <button onclick="toggleSidebar()" class="text-white hover:bg-blue-800 p-2 rounded">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+        </button>
+        <h1 class="text-lg font-semibold">Administração</h1>
+        <div class="w-10"></div> <!-- Placeholder para centralizar -->
+    </header>
+    
+    <!-- Conteúdo -->
+    <main id="main-content" class="flex-1 ml-0 md:ml-64 p-4 md:p-8">
+        {% block content %}{% endblock %}
+    </main>
+</div>
 
 </body>
 </html>

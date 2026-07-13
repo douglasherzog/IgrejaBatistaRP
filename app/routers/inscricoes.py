@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import APIRouter, Depends, Request, Form, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -7,6 +8,7 @@ from app.database import get_db
 from app.models import InscricaoEvento, Evento, Admin
 from app.auth import get_admin_atual
 from app.routers.site import get_all_configs
+from app.security import csrf_valid
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -16,17 +18,20 @@ templates = Jinja2Templates(directory="templates")
 async def inscrever_evento(
     id: int,
     request: Request,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    csrf_ok: bool = Depends(csrf_valid),
+    nome: str = Form(...),
+    telefone: Optional[str] = Form(None),
+    email: Optional[str] = Form(None),
 ):
     evento = db.query(Evento).filter(Evento.id == id).first()
     if not evento:
         raise HTTPException(status_code=404)
-    form = await request.form()
     insc = InscricaoEvento(
         evento_id=id,
-        nome=form.get("nome", ""),
-        telefone=form.get("telefone", "") or None,
-        email=form.get("email", "") or None,
+        nome=nome.strip(),
+        telefone=telefone.strip() if telefone else None,
+        email=email.strip() if email else None,
     )
     db.add(insc)
     db.commit()

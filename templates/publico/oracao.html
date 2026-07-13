@@ -18,6 +18,7 @@
     <div class="bg-white rounded-xl shadow p-8 mb-10">
         <h2 class="text-xl font-bold mb-4" style="font-family:var(--fonte-titulos);color:var(--cor-primaria)">🙏 Envie seu pedido</h2>
         <form method="post" action="/pedidos-oracao" class="space-y-4">
+            <input type="hidden" name="csrf_token" value="{{ request.state.csrf_token }}">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Seu nome *</label>
                 <input type="text" name="nome" required placeholder="Como podemos te chamar?"

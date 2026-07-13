@@ -1,0 +1,64 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Contribuições{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">🌱 Contribuições Recebidas</h1>
+        <a href="/admin/site#contribuicoes" class="bg-blue-900 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-800 transition">
+            Configurar Página
+        </a>
+    </div>
+
+    <div class="bg-white rounded-xl shadow overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
+                    <tr>
+                        <th class="px-4 py-3">Data</th>
+                        <th class="px-4 py-3">Nome</th>
+                        <th class="px-4 py-3">Contato</th>
+                        <th class="px-4 py-3">Valor</th>
+                        <th class="px-4 py-3">Mensagem</th>
+                        <th class="px-4 py-3">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y">
+                    {% for c in contribuicoes %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3 whitespace-nowrap">{{ c.criado_em.strftime('%d/%m/%Y %H:%M') }}</td>
+                        <td class="px-4 py-3 font-medium">{{ c.nome }}</td>
+                        <td class="px-4 py-3">
+                            {% if c.email %}<div class="text-xs">{{ c.email }}</div>{% endif %}
+                            {% if c.telefone %}<div class="text-xs text-gray-500">{{ c.telefone }}</div>{% endif %}
+                        </td>
+                        <td class="px-4 py-3">
+                            {% if c.valor %}
+                            <span class="font-semibold text-green-700">R$ {{ "%.2f"|format(c.valor|float) }}</span>
+                            {% else %}
+                            <span class="text-gray-400">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3 max-w-xs truncate">{{ c.mensagem or '-' }}</td>
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-1 rounded-full text-xs font-medium
+                                {% if c.status == 'confirmada' %}bg-green-100 text-green-700
+                                {% elif c.status == 'pendente' %}bg-yellow-100 text-yellow-700
+                                {% else %}bg-gray-100 text-gray-700{% endif %}">
+                                {{ c.status | capitalize }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="px-4 py-8 text-center text-gray-500">
+                            Nenhuma contribuição registrada ainda.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

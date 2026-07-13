@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import APIRouter, Depends, Request, Form, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
@@ -6,6 +7,7 @@ from app.database import get_db
 from app.models import PedidoOracao, Admin
 from app.auth import get_admin_atual
 from app.routers.site import get_all_configs
+from app.security import csrf_valid
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -14,16 +16,19 @@ templates = Jinja2Templates(directory="templates")
 @router.post("/pedidos-oracao")
 async def criar_pedido(
     request: Request,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    csrf_ok: bool = Depends(csrf_valid),
+    nome: str = Form(...),
+    pedido: str = Form(...),
+    publico: Optional[str] = Form(None),
 ):
-    form = await request.form()
-    pedido = PedidoOracao(
-        nome=form.get("nome", ""),
-        pedido=form.get("pedido", ""),
-        publico=form.get("publico") == "on",
+    novo = PedidoOracao(
+        nome=nome.strip(),
+        pedido=pedido.strip(),
+        publico=publico == "on",
         status="novo",
     )
-    db.add(pedido)
+    db.add(novo)
     db.commit()
     return RedirectResponse(url="/pedidos-oracao?ok=1", status_code=302)
 

@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% block title %}Contribuições – {{ cfg.nome_igreja }} {{ cfg.sigla_igreja }}{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<section class="py-16 px-4 text-center text-white" style="background-color:var(--cor-primaria)">
+    <h1 class="font-bold mb-2" style="font-family:var(--fonte-titulos);font-size:2.8rem">{{ cfg.contribuicao_titulo | default('Contribua com a Obra') }}</h1>
+    <p style="color:var(--cor-destaque)">{{ cfg.contribuicao_subtitulo | default('Sua semente faz a diferença') }}</p>
+</section>
+
+<section class="max-w-5xl mx-auto px-4 py-14">
+
+    {% if request.query_params.get('ok') %}
+    <div class="bg-green-50 border border-green-200 text-green-700 rounded-lg px-4 py-3 mb-8 text-center">
+        ✅ Sua intenção de contribuição foi registrada. Deus abençoe sua semente!
+    </div>
+    {% endif %}
+
+    {% if erro %}
+    <div class="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 mb-8 text-center">
+        ⚠️ {{ erro }}
+    </div>
+    {% endif %}
+
+    <!-- Mensagem de apelo -->
+    <div class="bg-white rounded-xl shadow p-8 mb-10 text-center">
+        <p class="text-lg text-gray-700 leading-relaxed" style="font-family:var(--fonte-titulos)">
+            {{ cfg.contribuicao_texto | default('Cada contribuição é uma semente que nos ajuda a continuar pregando o Evangelho, cuidando da comunidade e mantendo a casa de Deus. Agradecemos seu coração generoso!') }}
+        </p>
+        <p class="mt-4 text-sm text-gray-500 italic">"Cada um contribua conforme propôs no coração, não com pesar, pois Deus ama quem dá com alegria." – 2 Coríntios 9:7</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+        <!-- Pix -->
+        <div class="bg-white rounded-xl shadow p-8">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-3xl">💳</span>
+                <h2 class="text-2xl font-bold" style="font-family:var(--fonte-titulos);color:var(--cor-primaria)">Pix</h2>
+            </div>
+
+            {% if cfg.pix_qrcode_url %}
+            <div class="mb-6 text-center">
+                <img src="{{ cfg.pix_qrcode_url }}" alt="QR Code Pix" class="mx-auto rounded-lg border" style="max-width:260px">
+                <p class="text-xs text-gray-500 mt-2">Escaneie o QR Code com o app do seu banco</p>
+            </div>
+            {% endif %}
+
+            {% if cfg.pix_chave %}
+            <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                <p class="text-sm text-gray-600 mb-1"><strong>Tipo:</strong> {{ cfg.pix_tipo | default('Chave Pix') }}</p>
+                <div class="flex items-center justify-between gap-2">
+                    <code id="pix-chave" class="text-sm break-all">{{ cfg.pix_chave }}</code>
+                    <button type="button" onclick="copiarPix()" class="flex-shrink-0 px-3 py-1 text-xs text-white rounded" style="background:var(--cor-primaria)">
+                        Copiar
+                    </button>
+                </div>
+            </div>
+            {% else %}
+            <p class="text-gray-500 text-sm">Chave Pix ainda não configurada. Entre em contato com a igreja.</p>
+            {% endif %}
+
+            {% if cfg.contribuicao_whatsapp %}
+            <a href="https://wa.me/{{ cfg.contribuicao_whatsapp }}" target="_blank" class="block text-center mt-4 text-sm text-green-600 hover:underline">
+                💬 Dúvidas? Chame no WhatsApp
+            </a>
+            {% endif %}
+        </div>
+
+        <!-- Transferência Bancária -->
+        <div class="bg-white rounded-xl shadow p-8">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-3xl">🏦</span>
+                <h2 class="text-2xl font-bold" style="font-family:var(--fonte-titulos);color:var(--cor-primaria)">Transferência Bancária</h2>
+            </div>
+
+            {% if cfg.banco_nome %}
+            <div class="space-y-3 text-gray-700">
+                <div class="flex justify-between border-b pb-2">
+                    <span class="text-sm text-gray-500">Banco</span>
+                    <span class="font-medium">{{ cfg.banco_nome }}</span>
+                </div>
+                <div class="flex justify-between border-b pb-2">
+                    <span class="text-sm text-gray-500">Agência</span>
+                    <span class="font-medium">{{ cfg.banco_agencia }}</span>
+                </div>
+                <div class="flex justify-between border-b pb-2">
+                    <span class="text-sm text-gray-500">Conta</span>
+                    <span class="font-medium">{{ cfg.banco_conta }}</span>
+                </div>
+                <div class="flex justify-between border-b pb-2">
+                    <span class="text-sm text-gray-500">Tipo</span>
+                    <span class="font-medium">{{ cfg.banco_tipo_conta | default('Conta Corrente') }}</span>
+                </div>
+                <div class="flex justify-between border-b pb-2">
+                    <span class="text-sm text-gray-500">Titular</span>
+                    <span class="font-medium">{{ cfg.banco_titular }}</span>
+                </div>
+                {% if cfg.banco_cpf_cnpj %}
+                <div class="flex justify-between border-b pb-2">
+                    <span class="text-sm text-gray-500">CPF/CNPJ</span>
+                    <span class="font-medium">{{ cfg.banco_cpf_cnpj }}</span>
+                </div>
+                {% endif %}
+            </div>
+            {% else %}
+            <p class="text-gray-500 text-sm">Dados bancários ainda não configurados. Entre em contato com a igreja.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Formulário de intenção -->
+    <div class="bg-white rounded-xl shadow p-8">
+        <h2 class="text-2xl font-bold mb-4" style="font-family:var(--fonte-titulos);color:var(--cor-primaria)">🌱 Quero Semear</h2>
+        <p class="text-sm text-gray-600 mb-6">Registre sua intenção de contribuição. A liderança da igreja agradece seu amor e fidelidade.</p>
+
+        <form method="post" action="/contribuicoes" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input type="hidden" name="csrf_token" value="{{ request.state.csrf_token }}">
+
+            <div class="md:col-span-1">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Seu nome *</label>
+                <input type="text" name="nome" required placeholder="Como podemos te chamar?"
+                    class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div class="md:col-span-1">
+                <label class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
+                <input type="email" name="email" placeholder="seu@email.com"
+                    class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div class="md:col-span-1">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Telefone / WhatsApp</label>
+                <input type="text" name="telefone" placeholder="(51) 99999-9999"
+                    class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div class="md:col-span-1">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Valor da semente (R$)</label>
+                <input type="text" name="valor" placeholder="100,00"
+                    class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Mensagem / Oferto para</label>
+                <textarea name="mensagem" rows="3" placeholder="Dízimo, oferta, missões, construção..."
+                    class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+            </div>
+
+            <div class="md:col-span-2">
+                <button type="submit" class="text-white px-8 py-3 rounded-lg text-sm font-medium transition" style="background:var(--cor-primaria)" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+                    🌱 Registrar Intenção de Contribuição
+                </button>
+            </div>
+        </form>
+    </div>
+</section>
+
+<script>
+function copiarPix() {
+    const chave = document.getElementById('pix-chave').innerText;
+    navigator.clipboard.writeText(chave).then(() => {
+        alert('Chave Pix copiada!');
+    }).catch(() => {
+        alert('Não foi possível copiar automaticamente. Copie manualmente: ' + chave);
+    });
+}
+</script>
+{% endblock %}

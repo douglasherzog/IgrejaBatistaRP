@@ -145,3 +145,16 @@ class Foto(Base):
     destaque = Column(Boolean, default=False)
     ativo = Column(Boolean, default=True)
     criado_em = Column(DateTime, server_default=func.now())
+
+
+class Contribuicao(Base):
+    __tablename__ = "contribuicoes"
+
+    id = Column(Integer, primary_key=True, index=True)
+    nome = Column(String(100), nullable=False)
+    email = Column(String(255), nullable=True)
+    telefone = Column(String(20), nullable=True)
+    valor = Column(Numeric(10, 2), nullable=True)
+    mensagem = Column(Text, nullable=True)
+    status = Column(String(20), default="pendente")
+    criado_em = Column(DateTime, server_default=func.now())

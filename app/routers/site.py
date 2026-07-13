@@ -93,6 +93,24 @@ SECOES = {
             ("hero_imagem", "Imagem de Fundo do Hero (URL)", "text", "/static/img/hero.jpg", "URL da imagem de fundo da página inicial. Para enviar uma nova imagem, use o upload abaixo."),
         ],
     },
+    "Contribuições": {
+        "icon": "💰",
+        "campos": [
+            ("contribuicao_titulo", "Título da Página", "text", "Contribua com a Obra", "Título exibido no topo da página de contribuições."),
+            ("contribuicao_subtitulo", "Subtítulo", "text", "Sua semente faz a diferença", "Subtítulo da página de contribuições."),
+            ("contribuicao_texto", "Mensagem de Apelo", "textarea", "Cada contribuição é uma semente que nos ajuda a continuar pregando o Evangelho, cuidando da comunidade e mantendo a casa de Deus. Agradecemos seu coração generoso!", "Texto motivacional exibido na página de contribuições."),
+            ("pix_chave", "Chave Pix", "text", "", "Chave Pix da igreja (CPF, CNPJ, e-mail, telefone ou chave aleatória)."),
+            ("pix_tipo", "Tipo da Chave Pix", "select", "CNPJ", "Tipo da chave Pix cadastrada.", ["CPF", "CNPJ", "E-mail", "Celular", "Chave Aleatória"]),
+            ("pix_qrcode_url", "URL da Imagem do QR Code Pix", "text", "", "URL da imagem do QR Code do Pix. Faça upload em /admin/site ou use um link externo."),
+            ("banco_nome", "Nome do Banco", "text", "", "Nome do banco para transferência/depósito."),
+            ("banco_agencia", "Agência", "text", "", "Número da agência."),
+            ("banco_conta", "Conta Corrente", "text", "", "Número da conta corrente."),
+            ("banco_tipo_conta", "Tipo de Conta", "select", "Conta Corrente", "Tipo da conta bancária.", ["Conta Corrente", "Conta Poupança"]),
+            ("banco_titular", "Titular da Conta", "text", "", "Nome completo do titular da conta."),
+            ("banco_cpf_cnpj", "CPF/CNPJ do Titular", "text", "", "CPF ou CNPJ do titular da conta."),
+            ("contribuicao_whatsapp", "WhatsApp para Dúvidas", "text", "", "Número de WhatsApp para dúvidas sobre contribuições. Ex: 5551997267850"),
+        ],
+    },
 }
 
 

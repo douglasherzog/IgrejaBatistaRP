@@ -3,8 +3,10 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.base import BaseHTTPMiddleware
 from app.database import engine, Base, SessionLocal
-from app.routers import publico, auth, membros, caixa, admin_dashboard, site, eventos, videos, oracao, inscricoes, fotos, relatorios, importar
+from app.routers import publico, auth, membros, caixa, admin_dashboard, site, eventos, videos, oracao, inscricoes, fotos, relatorios, importar, notificacoes
 from app.routers.site import get_all_configs
+from app.security import CSRFMiddleware, get_csrf_token
+from app.rate_limit import RateLimitMiddleware, SlowAttackProtection
 
 Base.metadata.create_all(bind=engine)
 
@@ -28,9 +30,10 @@ class ConfigSiteMiddleware(BaseHTTPMiddleware):
 app.add_middleware(ConfigSiteMiddleware)
 
 
-# Filtro global Jinja2: disponibiliza cfg em todos os templates
+# Filtro global Jinja2: disponibiliza cfg e helpers em todos os templates
 templates_instance = Jinja2Templates(directory="templates")
 templates_instance.env.globals["get_cfg"] = lambda request: getattr(request.state, "cfg", {})
+templates_instance.env.globals["get_csrf_token"] = get_csrf_token
 
 
 app.include_router(publico.router)
@@ -46,3 +49,11 @@ app.include_router(inscricoes.router)
 app.include_router(fotos.router)
 app.include_router(relatorios.router)
 app.include_router(importar.router)
+app.include_router(notificacoes.router)
+
+# Middleware CSRF para proteção contra ataques
+app.add_middleware(CSRFMiddleware)
+
+# Middlewares de Rate Limiting
+app.add_middleware(RateLimitMiddleware, requests_per_minute=60)
+app.add_middleware(SlowAttackProtection, max_delay_seconds=10)
