@@ -89,11 +89,13 @@
         {% if mensal %}
         <div>
             <p class="text-sm text-gray-500 mb-2">Últimos Meses</p>
-            {% for mes, valor in list(mensal.items())[:6] %}
+            {% for mes, valor in mensal.items() %}
+            {% if loop.index <= 6 %}
             <div class="flex justify-between text-sm mb-1">
                 <span>{{ mes.split('-')[1] }}/{{ mes.split('-')[0] }}</span>
                 <span class="font-medium">R$ {{ "%.2f"|format(valor) }}</span>
             </div>
+            {% endif %}
             {% endfor %}
         </div>
         {% endif %}

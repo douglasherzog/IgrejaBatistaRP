@@ -1,5 +1,6 @@
 import csv
 import io
+from datetime import datetime
 from fastapi import APIRouter, Depends, Request, Query
 from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
@@ -10,6 +11,13 @@ from collections import defaultdict
 from app.database import get_db
 from app.models import Lancamento, TipoLancamento, Membro, Evento, InscricaoEvento, PedidoOracao, Admin
 from app.auth import get_admin_atual
+import openpyxl
+from openpyxl.styles import Font, PatternFill, Alignment
+from reportlab.lib.pagesizes import letter, A4
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib import colors
+from reportlab.lib.units import inch
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -222,3 +230,292 @@ def relatorio_geral(
         "meses": MESES,
         "ano": hoje.year,
     })
+
+
+# ===== EXPORTAÇÃO EXCEL =====
+
+@router.get("/admin/relatorios/caixa/excel")
+def exportar_caixa_excel(
+    ano: int = Query(...),
+    db: Session = Depends(get_db),
+    admin: Admin = Depends(get_admin_atual)
+):
+    """Exporta relatório de caixa em Excel"""
+    
+    # Buscar dados do relatório
+    lancamentos = db.query(Lancamento).filter(
+        extract('year', Lancamento.data) == ano
+    ).order_by(Lancamento.data).all()
+    
+    # Criar workbook Excel
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = f"Caixa {ano}"
+    
+    # Estilos
+    header_font = Font(bold=True, color='FFFFFF')
+    header_fill = PatternFill(start_color='366092', end_color='366092', fill_type='solid')
+    header_alignment = Alignment(horizontal='center', vertical='center')
+    
+    # Cabeçalho
+    headers = ['Data', 'Tipo', 'Categoria', 'Descrição', 'Valor', 'Membro']
+    for col, header in enumerate(headers, 1):
+        cell = ws.cell(row=1, column=col, value=header)
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = header_alignment
+    
+    # Dados
+    for row, lanc in enumerate(lancamentos, 2):
+        ws.cell(row=row, column=1, value=lanc.data.strftime('%d/%m/%Y'))
+        ws.cell(row=row, column=2, value='Receita' if lanc.tipo == TipoLancamento.receita else 'Despesa')
+        ws.cell(row=row, column=3, value=lanc.categoria)
+        ws.cell(row=row, column=4, value=lanc.descricao)
+        ws.cell(row=row, column=5, value=float(lanc.valor))
+        ws.cell(row=row, column=6, value=f"{lanc.membro.nome} {lanc.membro.sobrenome}" if lanc.membro else '-')
+    
+    # Ajustar colunas
+    for column in ws.columns:
+        max_length = 0
+        column_letter = column[0].column_letter
+        for cell in column:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(str(cell.value))
+            except:
+                pass
+        adjusted_width = min(max_length + 2, 50)
+        ws.column_dimensions[column_letter].width = adjusted_width
+    
+    # Salvar em memória
+    excel_buffer = io.BytesIO()
+    wb.save(excel_buffer)
+    excel_buffer.seek(0)
+    
+    filename = f"relatorio_caixa_{ano}.xlsx"
+    
+    return StreamingResponse(
+        io.BytesIO(excel_buffer.read()),
+        media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
+
+
+@router.get("/admin/relatorios/membros/excel")
+def exportar_membros_excel(
+    db: Session = Depends(get_db),
+    admin: Admin = Depends(get_admin_atual)
+):
+    """Exporta relatório de membros em Excel"""
+    
+    # Buscar dados
+    membros = db.query(Membro).order_by(Membro.nome).all()
+    
+    # Criar workbook Excel
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Membros"
+    
+    # Estilos
+    header_font = Font(bold=True, color='FFFFFF')
+    header_fill = PatternFill(start_color='366092', end_color='366092', fill_type='solid')
+    header_alignment = Alignment(horizontal='center', vertical='center')
+    
+    # Cabeçalho
+    headers = ['Nome', 'Sobrenome', 'Telefone', 'Email', 'Data Nascimento', 'Data Batismo', 'Cidade', 'Estado', 'Status', 'Data Cadastro']
+    for col, header in enumerate(headers, 1):
+        cell = ws.cell(row=1, column=col, value=header)
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = header_alignment
+    
+    # Dados
+    for row, membro in enumerate(membros, 2):
+        ws.cell(row=row, column=1, value=membro.nome)
+        ws.cell(row=row, column=2, value=membro.sobrenome)
+        ws.cell(row=row, column=3, value=membro.telefone or '')
+        ws.cell(row=row, column=4, value=membro.email or '')
+        ws.cell(row=row, column=5, value=membro.data_nascimento.strftime('%d/%m/%Y') if membro.data_nascimento else '')
+        ws.cell(row=row, column=6, value=membro.data_batismo.strftime('%d/%m/%Y') if membro.data_batismo else '')
+        ws.cell(row=row, column=7, value=membro.cidade or '')
+        ws.cell(row=row, column=8, value=membro.estado or '')
+        ws.cell(row=row, column=9, value='Ativo' if membro.ativo else 'Inativo')
+        ws.cell(row=row, column=10, value=membro.data_cadastro.strftime('%d/%m/%Y') if membro.data_cadastro else '')
+    
+    # Ajustar colunas
+    for column in ws.columns:
+        max_length = 0
+        column_letter = column[0].column_letter
+        for cell in column:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(str(cell.value))
+            except:
+                pass
+        adjusted_width = min(max_length + 2, 50)
+        ws.column_dimensions[column_letter].width = adjusted_width
+    
+    # Salvar em memória
+    excel_buffer = io.BytesIO()
+    wb.save(excel_buffer)
+    excel_buffer.seek(0)
+    
+    filename = "relatorio_membros.xlsx"
+    
+    return StreamingResponse(
+        io.BytesIO(excel_buffer.read()),
+        media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
+
+
+# ===== EXPORTAÇÃO PDF =====
+
+@router.get("/admin/relatorios/caixa/pdf")
+def exportar_caixa_pdf(
+    ano: int = Query(...),
+    db: Session = Depends(get_db),
+    admin: Admin = Depends(get_admin_atual)
+):
+    """Exporta relatório de caixa em PDF"""
+    
+    # Buscar dados
+    lancamentos = db.query(Lancamento).filter(
+        extract('year', Lancamento.data) == ano
+    ).order_by(Lancamento.data).all()
+    
+    # Criar buffer PDF
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4)
+    
+    # Estilos
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=18,
+        spaceAfter=30,
+        alignment=1  # centro
+    )
+    
+    # Conteúdo
+    story = []
+    
+    # Título
+    story.append(Paragraph(f"Relatório de Caixa - {ano}", title_style))
+    story.append(Spacer(1, 12))
+    
+    # Dados da tabela
+    data = [['Data', 'Tipo', 'Categoria', 'Descrição', 'Valor']]
+    
+    for lanc in lancamentos:
+        data.append([
+            lanc.data.strftime('%d/%m/%Y'),
+            'Receita' if lanc.tipo == TipoLancamento.receita else 'Despesa',
+            lanc.categoria,
+            lanc.descricao[:30] + '...' if len(lanc.descricao) > 30 else lanc.descricao,
+            f"R$ {lanc.valor:.2f}"
+        ])
+    
+    # Criar tabela
+    table = Table(data, colWidths=[1*inch, 1*inch, 1.5*inch, 2*inch, 1*inch])
+    
+    # Estilo da tabela
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#366092')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f5f5f5')),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('FONTSIZE', (0, 1), (-1, -1), 8),
+    ]))
+    
+    story.append(table)
+    
+    # Construir PDF
+    doc.build(story)
+    buffer.seek(0)
+    
+    filename = f"relatorio_caixa_{ano}.pdf"
+    
+    return StreamingResponse(
+        io.BytesIO(buffer.read()),
+        media_type='application/pdf',
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
+
+
+@router.get("/admin/relatorios/membros/pdf")
+def exportar_membros_pdf(
+    db: Session = Depends(get_db),
+    admin: Admin = Depends(get_admin_atual)
+):
+    """Exporta relatório de membros em PDF"""
+    
+    # Buscar dados
+    membros = db.query(Membro).order_by(Membro.nome).all()
+    
+    # Criar buffer PDF
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, landscape=True)
+    
+    # Estilos
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=18,
+        spaceAfter=30,
+        alignment=1  # centro
+    )
+    
+    # Conteúdo
+    story = []
+    
+    # Título
+    story.append(Paragraph("Relatório de Membros", title_style))
+    story.append(Spacer(1, 12))
+    
+    # Dados da tabela
+    data = [['Nome', 'Telefone', 'Cidade', 'Status']]
+    
+    for membro in membros:
+        data.append([
+            f"{membro.nome} {membro.sobrenome}",
+            membro.telefone or '-',
+            membro.cidade or '-',
+            'Ativo' if membro.ativo else 'Inativo'
+        ])
+    
+    # Criar tabela
+    table = Table(data, colWidths=[3*inch, 2*inch, 2*inch, 1*inch])
+    
+    # Estilo da tabela
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#366092')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f5f5f5')),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('FONTSIZE', (0, 1), (-1, -1), 8),
+    ]))
+    
+    story.append(table)
+    
+    # Construir PDF
+    doc.build(story)
+    buffer.seek(0)
+    
+    filename = "relatorio_membros.pdf"
+    
+    return StreamingResponse(
+        io.BytesIO(buffer.read()),
+        media_type='application/pdf',
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )

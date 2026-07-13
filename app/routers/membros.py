@@ -6,12 +6,15 @@ from datetime import date
 from app.database import get_db
 from app.models import Membro, Admin, Lancamento, TipoLancamento
 from app.auth import get_admin_atual
+from app.cache import cache
+from app.utils.telefone import normalizar_telefone
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
 
 @router.get("/admin/membros", response_class=HTMLResponse)
+@cache(expire_minutes=15)
 def listar_membros(
     request: Request,
     busca: str = "",
@@ -232,56 +235,66 @@ def detalhes_membro(
     db: Session = Depends(get_db),
     admin: Admin = Depends(get_admin_atual)
 ):
-    membro = db.query(Membro).filter(Membro.id == id).first()
-    if not membro:
-        raise HTTPException(status_code=404)
+    try:
+        membro = db.query(Membro).filter(Membro.id == id).first()
+        if not membro:
+            raise HTTPException(status_code=404)
+        
+        # Buscar receitas do membro
+        query = db.query(Lancamento).filter(
+            Lancamento.membro_id == membro.id,
+            Lancamento.tipo == TipoLancamento.receita
+        )
+        
+        # Aplicar filtro de período se fornecido
+        if data_inicio and data_fim:
+            try:
+                inicio = date.fromisoformat(data_inicio)
+                fim = date.fromisoformat(data_fim)
+                query = query.filter(Lancamento.data >= inicio, Lancamento.data <= fim)
+            except ValueError:
+                pass
+        
+        receitas = query.order_by(Lancamento.data.desc()).all()
+        
+        # Calcular estatísticas
+        total_receitas = sum(r.valor for r in receitas)
+        
+        # Agrupar por categoria
+        categorias = {}
+        for r in receitas:
+            if r.categoria not in categorias:
+                categorias[r.categoria] = 0
+            categorias[r.categoria] += r.valor
+        
+        # Agrupar por ano/mês
+        mensal = {}
+        for r in receitas:
+            chave = f"{r.data.year}-{r.data.month:02d}"
+            if chave not in mensal:
+                mensal[chave] = 0
+            mensal[chave] += r.valor
+        
+        return templates.TemplateResponse("admin/membros/detalhes.html", {
+            "request": request,
+            "membro": membro,
+            "receitas": receitas,
+            "total_receitas": total_receitas,
+            "categorias": dict(sorted(categorias.items())),
+            "mensal": dict(sorted(mensal.items(), reverse=True)),
+            "data_inicio": data_inicio,
+            "data_fim": data_fim,
+            "hoje": date.today(),
+        })
     
-    # Buscar receitas do membro
-    query = db.query(Lancamento).filter(
-        Lancamento.membro_id == membro.id,
-        Lancamento.tipo == TipoLancamento.receita
-    )
-    
-    # Aplicar filtro de período se fornecido
-    if data_inicio and data_fim:
-        try:
-            inicio = date.fromisoformat(data_inicio)
-            fim = date.fromisoformat(data_fim)
-            query = query.filter(Lancamento.data >= inicio, Lancamento.data <= fim)
-        except ValueError:
-            pass
-    
-    receitas = query.order_by(Lancamento.data.desc()).all()
-    
-    # Calcular estatísticas
-    total_receitas = sum(r.valor for r in receitas)
-    
-    # Agrupar por categoria
-    categorias = {}
-    for r in receitas:
-        if r.categoria not in categorias:
-            categorias[r.categoria] = 0
-        categorias[r.categoria] += r.valor
-    
-    # Agrupar por ano/mês
-    mensal = {}
-    for r in receitas:
-        chave = f"{r.data.year}-{r.data.month:02d}"
-        if chave not in mensal:
-            mensal[chave] = 0
-        mensal[chave] += r.valor
-    
-    return templates.TemplateResponse("admin/membros/detalhes.html", {
-        "request": request,
-        "membro": membro,
-        "receitas": receitas,
-        "total_receitas": total_receitas,
-        "categorias": dict(sorted(categorias.items())),
-        "mensal": dict(sorted(mensal.items(), reverse=True)),
-        "data_inicio": data_inicio,
-        "data_fim": data_fim,
-        "hoje": date.today(),
-    })
+    except HTTPException:
+        raise
+    except Exception as e:
+        # Log do erro para depuração
+        print(f"Erro em detalhes_membro ID {id}: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
 
 
 @router.get("/admin/membros/novo", response_class=HTMLResponse)
@@ -309,12 +322,15 @@ def criar_membro(
     db: Session = Depends(get_db),
     admin: Admin = Depends(get_admin_atual)
 ):
+    # Normalizar telefone
+    telefone_normalizado = normalizar_telefone(telefone) if telefone else None
+    
     membro = Membro(
         nome=nome,
         sobrenome=sobrenome,
         data_nascimento=date.fromisoformat(data_nascimento) if data_nascimento else None,
         data_batismo=date.fromisoformat(data_batismo) if data_batismo else None,
-        telefone=telefone or None,
+        telefone=telefone_normalizado,
         email=email or None,
         endereco=endereco or None,
         bairro=bairro or None,
@@ -362,6 +378,9 @@ def atualizar_membro(
     db: Session = Depends(get_db),
     admin: Admin = Depends(get_admin_atual)
 ):
+    # Normalizar telefone
+    telefone_normalizado = normalizar_telefone(telefone) if telefone else None
+    
     membro = db.query(Membro).filter(Membro.id == id).first()
     if not membro:
         raise HTTPException(status_code=404)
@@ -369,7 +388,7 @@ def atualizar_membro(
     membro.sobrenome = sobrenome
     membro.data_nascimento = date.fromisoformat(data_nascimento) if data_nascimento else None
     membro.data_batismo = date.fromisoformat(data_batismo) if data_batismo else None
-    membro.telefone = telefone or None
+    membro.telefone = telefone_normalizado
     membro.email = email or None
     membro.endereco = endereco or None
     membro.bairro = bairro or None
