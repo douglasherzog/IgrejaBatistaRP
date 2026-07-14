@@ -19,6 +19,7 @@ SECOES = {
             ("nome_igreja", "Nome da Igreja", "text", "Igreja Batista Independente Nova Vida", "Nome completo da igreja. Aparece no topo do site e no rodapé."),
             ("sigla_igreja", "Sigla", "text", "IBINOVI", "Sigla ou nome curto da igreja. Ex: IBINOVI."),
             ("cidade_estado", "Cidade/Estado", "text", "Rio Pardo – RS", "Cidade e estado onde a igreja está localizada."),
+            ("cnpj", "CNPJ", "text", "", "CNPJ da igreja. Ex: 12.345.678/0001-99. Aparece no rodapé."),
             ("ano_fundacao", "Ano de Fundação", "text", "", "Ano em que a igreja foi fundada. Opcional."),
             ("logo_url", "Logo (URL)", "text", "/static/img/logo.png", "URL da imagem do logo. Para enviar uma nova imagem, use o upload abaixo. Se deixar em branco, usa o logo padrão."),
         ],

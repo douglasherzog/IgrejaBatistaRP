@@ -254,6 +254,7 @@
             <div>
                 <p class="font-semibold text-white mb-2" style="font-family:var(--fonte-titulos);font-size:1.1rem">{{ cfg.nome_igreja | default('Igreja Batista Independente Nova Vida') }}</p>
                 <p class="text-xs" style="color:var(--cor-destaque);letter-spacing:0.12em">{{ cfg.sigla_igreja | default('IBINOVI') }} – {{ cfg.cidade_estado | default('RIO PARDO/RS') }}</p>
+                {% if cfg.cnpj %}<p class="text-xs mt-1" style="color:var(--cor-destaque);letter-spacing:0.12em">CNPJ: {{ cfg.cnpj }}</p>{% endif %}
             </div>
             <div>
                 <p class="font-semibold text-white mb-2 uppercase tracking-widest text-xs">Endereço</p>
