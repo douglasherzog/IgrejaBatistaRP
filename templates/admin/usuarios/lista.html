@@ -22,14 +22,14 @@
         </div>
     {% endif %}
 
-    <div class="bg-white rounded-lg shadow overflow-hidden">
-        <table class="w-full text-sm text-left">
+    <div class="bg-white rounded-lg shadow overflow-x-auto">
+        <table class="w-full min-w-[760px] text-sm text-left">
             <thead class="bg-gray-100 text-gray-600 uppercase">
                 <tr>
-                    <th class="px-4 py-3">E-mail</th>
-                    <th class="px-4 py-3">TOTP</th>
-                    <th class="px-4 py-3">Criado em</th>
-                    <th class="px-4 py-3 text-right">Ações</th>
+                    <th class="px-4 py-3 w-1/3">E-mail</th>
+                    <th class="px-4 py-3 whitespace-nowrap">TOTP</th>
+                    <th class="px-4 py-3 whitespace-nowrap">Criado em</th>
+                    <th class="px-4 py-3 min-w-[340px]">Ações</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
@@ -44,22 +44,24 @@
                         {% endif %}
                     </td>
                     <td class="px-4 py-3">{{ u.criado_em | sp_format('%d/%m/%Y %H:%M') if u.criado_em else '-' }}</td>
-                    <td class="px-4 py-3 text-right">
-                        <a href="/admin/usuarios/{{ u.id }}/permissoes" class="text-blue-900 hover:underline mr-3">Permissões</a>
-                        <a href="/admin/usuarios/{{ u.id }}/dispositivos" class="text-blue-900 hover:underline mr-3">Dispositivos</a>
-                        <a href="/admin/usuarios/{{ u.id }}/editar" class="text-blue-900 hover:underline mr-3">Alterar senha</a>
-                        {% if u.totp_ativo %}
-                        <form action="/admin/usuarios/{{ u.id }}/resetar-totp" method="post" class="inline mr-3">
-                            <button type="submit" class="text-orange-600 hover:underline" onclick="return confirm('Resetar TOTP deste usuário?')">Resetar TOTP</button>
-                        </form>
-                        {% endif %}
-                        {% if u.id != admin_atual.id %}
-                        <form action="/admin/usuarios/{{ u.id }}/excluir" method="post" class="inline">
-                            <button type="submit" class="text-red-600 hover:underline" onclick="return confirm('Excluir este usuário?')">Excluir</button>
-                        </form>
-                        {% else %}
+                    <td class="px-4 py-3">
+                        <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+                            <a href="/admin/usuarios/{{ u.id }}/permissoes" class="text-blue-900 hover:underline">Permissões</a>
+                            <a href="/admin/usuarios/{{ u.id }}/dispositivos" class="text-blue-900 hover:underline">Dispositivos</a>
+                            <a href="/admin/usuarios/{{ u.id }}/editar" class="text-blue-900 hover:underline">Alterar senha</a>
+                            {% if u.totp_ativo %}
+                            <form action="/admin/usuarios/{{ u.id }}/resetar-totp" method="post">
+                                <button type="submit" class="text-orange-600 hover:underline" onclick="return confirm('Resetar TOTP deste usuário?')">Resetar TOTP</button>
+                            </form>
+                            {% endif %}
+                            {% if u.id != admin_atual.id %}
+                            <form action="/admin/usuarios/{{ u.id }}/excluir" method="post">
+                                <button type="submit" class="text-red-600 hover:underline" onclick="return confirm('Excluir este usuário?')">Excluir</button>
+                            </form>
+                            {% else %}
                             <span class="text-gray-400">Você</span>
-                        {% endif %}
+                            {% endif %}
+                        </div>
                     </td>
                 </tr>
                 {% endfor %}
