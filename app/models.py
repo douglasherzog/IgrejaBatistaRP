@@ -41,6 +41,7 @@ class AcessoLog(Base):
     path = Column(String(255), nullable=True)
     ip = Column(String(50), nullable=True)
     user_agent = Column(String(500), nullable=True)
+    device_token = Column(String(128), nullable=True, index=True)
     detalhes = Column(Text, nullable=True)
     criado_em = Column(DateTime, server_default=func.now())
 
@@ -56,6 +57,7 @@ class DispositivoOtpExento(Base):
     id = Column(Integer, primary_key=True, index=True)
     admin_id = Column(Integer, ForeignKey("admins.id"), nullable=False)
     fingerprint = Column(String(128), nullable=False)
+    device_token = Column(String(128), nullable=True, index=True)
     nome = Column(String(100), nullable=True)
     ip = Column(String(50), nullable=True)
     user_agent = Column(String(500), nullable=True)

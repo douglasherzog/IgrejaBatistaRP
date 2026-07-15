@@ -27,7 +27,7 @@ AREAS_ADMIN = [
 ]
 
 
-def log_acesso(db: Session, acao: str, admin: Admin = None, email: str = None, path: str = None, request: Request = None, detalhes: str = None):
+def log_acesso(db: Session, acao: str, admin: Admin = None, email: str = None, path: str = None, request: Request = None, detalhes: str = None, device_token: str = None):
     log = AcessoLog(
         admin_id=admin.id if admin else None,
         email=email or (admin.email if admin else None),
@@ -35,6 +35,7 @@ def log_acesso(db: Session, acao: str, admin: Admin = None, email: str = None, p
         path=path,
         ip=request.client.host if request and request.client else None,
         user_agent=request.headers.get("user-agent") if request else None,
+        device_token=device_token,
         detalhes=detalhes,
     )
     db.add(log)
@@ -62,17 +63,22 @@ def login(
             {"request": request, "erro": "Email ou senha incorretos"}
         )
 
-    log_acesso(db, acao="login_sucesso", admin=admin, path="/admin/login", request=request)
+    device_token = request.cookies.get("device_token") or auth_service.gerar_device_token()
+    isento = auth_service.dispositivo_otp_exento(db, admin.id, request)
 
-    if admin.totp_ativo and not auth_service.dispositivo_otp_exento(db, admin.id, request):
+    log_acesso(db, acao="login_sucesso", admin=admin, path="/admin/login", request=request, device_token=device_token, detalhes=f"isento={isento}")
+
+    if admin.totp_ativo and not isento:
         token_temp = auth_service.criar_token({"sub": admin.id, "etapa": "totp"})
         resp = RedirectResponse(url="/admin/totp", status_code=302)
         resp.set_cookie("totp_token", token_temp, httponly=True, max_age=300)
+        resp.set_cookie("device_token", device_token, httponly=True, max_age=3600 * 24 * 365)
         return resp
 
     token = auth_service.criar_token({"sub": admin.id})
     resp = RedirectResponse(url="/admin/dashboard", status_code=302)
     resp.set_cookie("session_token", token, httponly=True, max_age=3600 * 8)
+    resp.set_cookie("device_token", device_token, httponly=True, max_age=3600 * 24 * 365)
     return resp
 
 
@@ -101,10 +107,12 @@ def totp_verificar(
             "admin/totp.html",
             {"request": request, "erro": "Código inválido ou expirado"}
         )
-    log_acesso(db, acao="totp_sucesso", admin=admin, path="/admin/totp", request=request)
+    device_token = request.cookies.get("device_token") or auth_service.gerar_device_token()
+    log_acesso(db, acao="totp_sucesso", admin=admin, path="/admin/totp", request=request, device_token=device_token, detalhes=f"fingerprint={auth_service.get_fingerprint(request)}")
     token = auth_service.criar_token({"sub": admin.id})
     resp = RedirectResponse(url="/admin/dashboard", status_code=302)
     resp.set_cookie("session_token", token, httponly=True, max_age=3600 * 8)
+    resp.set_cookie("device_token", device_token, httponly=True, max_age=3600 * 24 * 365)
     resp.delete_cookie("totp_token")
     return resp
 
@@ -375,16 +383,20 @@ async def adicionar_dispositivo(
     id: int,
     request: Request,
     nome: str = Form(...),
-    fingerprint: str = Form(...),
+    fingerprint: str = Form(""),
+    device_token: str = Form(""),
     db: Session = Depends(get_db),
     admin: Admin = Depends(auth_service.get_admin_superadmin)
 ):
     usuario = db.query(Admin).filter(Admin.id == id).first()
     if not usuario:
         raise HTTPException(status_code=404)
+    if not fingerprint and not device_token:
+        return RedirectResponse(url=f"/admin/usuarios/{id}/dispositivos?erro=1", status_code=302)
     disp = DispositivoOtpExento(
         admin_id=usuario.id,
-        fingerprint=fingerprint,
+        fingerprint=fingerprint or auth_service.get_fingerprint(request),
+        device_token=device_token or None,
         nome=nome,
         ip=request.client.host if request.client else None,
         user_agent=request.headers.get("user-agent"),
@@ -428,6 +440,40 @@ def excluir_dispositivo(
     db.commit()
     log_acesso(db, acao="dispositivo_otp_excluido", admin=admin, path=f"/admin/usuarios/{id}/dispositivos/{disp_id}/excluir", request=request, detalhes=f"Dispositivo {disp_id}")
     return RedirectResponse(url=f"/admin/usuarios/{id}/dispositivos?ok=1", status_code=302)
+
+
+@router.post("/admin/logs/{log_id}/isentir")
+def isentir_dispositivo_pelo_log(
+    log_id: int,
+    request: Request,
+    db: Session = Depends(get_db),
+    admin: Admin = Depends(auth_service.get_admin_superadmin)
+):
+    log = db.query(AcessoLog).filter(AcessoLog.id == log_id).first()
+    if not log or not log.admin_id or not log.device_token:
+        raise HTTPException(status_code=400, detail="Log inválido ou sem device token")
+
+    existing = db.query(DispositivoOtpExento).filter_by(
+        admin_id=log.admin_id, device_token=log.device_token
+    ).first()
+    if existing:
+        existing.ativo = True
+        existing.fingerprint = log.fingerprint
+        existing.ip = log.ip
+        existing.user_agent = log.user_agent
+    else:
+        db.add(DispositivoOtpExento(
+            admin_id=log.admin_id,
+            fingerprint=log.fingerprint,
+            device_token=log.device_token,
+            nome=f"Dispositivo isentado em {log.criado_em.strftime('%d/%m/%Y %H:%M') if log.criado_em else 'log'}",
+            ip=log.ip,
+            user_agent=log.user_agent,
+            ativo=True,
+        ))
+    db.commit()
+    log_acesso(db, acao="dispositivo_otp_isentado", admin=admin, path=f"/admin/logs/{log_id}/isentir", request=request, detalhes=f"Admin: {log.email}; token: {log.device_token}")
+    return RedirectResponse(url="/admin/logs?ok=1", status_code=302)
 
 
 @router.get("/admin/logs", response_class=HTMLResponse)

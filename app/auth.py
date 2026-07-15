@@ -124,7 +124,18 @@ def get_fingerprint(request: Request) -> str:
 
 def dispositivo_otp_exento(db: Session, admin_id: int, request: Request) -> bool:
     from app.models import DispositivoOtpExento
+    device_token = request.cookies.get("device_token")
+    if device_token:
+        if db.query(DispositivoOtpExento).filter_by(
+            admin_id=admin_id, device_token=device_token, ativo=True
+        ).first():
+            return True
     fp = get_fingerprint(request)
     return db.query(DispositivoOtpExento).filter_by(
         admin_id=admin_id, fingerprint=fp, ativo=True
     ).first() is not None
+
+
+def gerar_device_token() -> str:
+    import secrets
+    return secrets.token_urlsafe(32)
