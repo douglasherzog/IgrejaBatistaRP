@@ -121,3 +121,135 @@ def setup_totp_confirmar(
     admin.totp_ativo = True
     db.commit()
     return RedirectResponse(url="/admin/login?setup=ok", status_code=302)
+
+
+@router.get("/admin/usuarios", response_class=HTMLResponse)
+def listar_usuarios(
+    request: Request,
+    db: Session = Depends(get_db),
+    admin: Admin = Depends(auth_service.get_admin_atual)
+):
+    usuarios = db.query(Admin).order_by(Admin.id).all()
+    return templates.TemplateResponse("admin/usuarios/lista.html", {
+        "request": request,
+        "usuarios": usuarios,
+        "admin_atual": admin,
+    })
+
+
+@router.get("/admin/usuarios/novo", response_class=HTMLResponse)
+def novo_usuario_page(
+    request: Request,
+    admin: Admin = Depends(auth_service.get_admin_atual)
+):
+    return templates.TemplateResponse("admin/usuarios/form.html", {
+        "request": request,
+        "usuario": None,
+        "erro": None,
+    })
+
+
+@router.post("/admin/usuarios/novo")
+def criar_usuario(
+    request: Request,
+    email: str = Form(...),
+    senha: str = Form(...),
+    confirmar_senha: str = Form(...),
+    db: Session = Depends(get_db),
+    admin: Admin = Depends(auth_service.get_admin_atual)
+):
+    if senha != confirmar_senha:
+        return templates.TemplateResponse("admin/usuarios/form.html", {
+            "request": request,
+            "usuario": None,
+            "erro": "As senhas não conferem.",
+        }, status_code=400)
+
+    if db.query(Admin).filter(Admin.email == email).first():
+        return templates.TemplateResponse("admin/usuarios/form.html", {
+            "request": request,
+            "usuario": None,
+            "erro": "Já existe um admin com esse e-mail.",
+        }, status_code=400)
+
+    novo = Admin(
+        email=email,
+        senha_hash=auth_service.hash_senha(senha),
+        totp_ativo=False,
+    )
+    db.add(novo)
+    db.commit()
+    return RedirectResponse(url="/admin/usuarios?ok=1", status_code=302)
+
+
+@router.get("/admin/usuarios/{id}/editar", response_class=HTMLResponse)
+def editar_usuario_page(
+    id: int,
+    request: Request,
+    db: Session = Depends(get_db),
+    admin: Admin = Depends(auth_service.get_admin_atual)
+):
+    usuario = db.query(Admin).filter(Admin.id == id).first()
+    if not usuario:
+        raise HTTPException(status_code=404)
+    return templates.TemplateResponse("admin/usuarios/form.html", {
+        "request": request,
+        "usuario": usuario,
+        "erro": None,
+    })
+
+
+@router.post("/admin/usuarios/{id}/editar")
+def atualizar_usuario(
+    id: int,
+    request: Request,
+    senha: str = Form(...),
+    confirmar_senha: str = Form(...),
+    db: Session = Depends(get_db),
+    admin: Admin = Depends(auth_service.get_admin_atual)
+):
+    usuario = db.query(Admin).filter(Admin.id == id).first()
+    if not usuario:
+        raise HTTPException(status_code=404)
+
+    if senha != confirmar_senha:
+        return templates.TemplateResponse("admin/usuarios/form.html", {
+            "request": request,
+            "usuario": usuario,
+            "erro": "As senhas não conferem.",
+        }, status_code=400)
+
+    usuario.senha_hash = auth_service.hash_senha(senha)
+    db.commit()
+    return RedirectResponse(url="/admin/usuarios?ok=1", status_code=302)
+
+
+@router.post("/admin/usuarios/{id}/resetar-totp")
+def resetar_totp(
+    id: int,
+    db: Session = Depends(get_db),
+    admin: Admin = Depends(auth_service.get_admin_atual)
+):
+    usuario = db.query(Admin).filter(Admin.id == id).first()
+    if not usuario:
+        raise HTTPException(status_code=404)
+    usuario.totp_secret = None
+    usuario.totp_ativo = False
+    db.commit()
+    return RedirectResponse(url="/admin/usuarios?ok=1", status_code=302)
+
+
+@router.post("/admin/usuarios/{id}/excluir")
+def excluir_usuario(
+    id: int,
+    db: Session = Depends(get_db),
+    admin: Admin = Depends(auth_service.get_admin_atual)
+):
+    usuario = db.query(Admin).filter(Admin.id == id).first()
+    if not usuario:
+        raise HTTPException(status_code=404)
+    if usuario.id == admin.id:
+        return RedirectResponse(url="/admin/usuarios?erro=nao-pode-excluir-proprio", status_code=302)
+    db.delete(usuario)
+    db.commit()
+    return RedirectResponse(url="/admin/usuarios?ok=1", status_code=302)

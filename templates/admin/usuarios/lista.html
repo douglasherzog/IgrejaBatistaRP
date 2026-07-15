@@ -1,0 +1,68 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Usuários Admin{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-blue-900">Usuários Admin</h1>
+        <a href="/admin/usuarios/novo" class="bg-blue-900 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition">
+            + Novo usuário
+        </a>
+    </div>
+
+    {% if request.query_params.ok %}
+        <div class="bg-green-100 text-green-800 px-4 py-3 rounded-lg mb-4">
+            Operação realizada com sucesso.
+        </div>
+    {% endif %}
+    {% if request.query_params.erro == 'nao-pode-excluir-proprio' %}
+        <div class="bg-red-100 text-red-800 px-4 py-3 rounded-lg mb-4">
+            Você não pode excluir seu próprio usuário.
+        </div>
+    {% endif %}
+
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <table class="w-full text-sm text-left">
+            <thead class="bg-gray-100 text-gray-600 uppercase">
+                <tr>
+                    <th class="px-4 py-3">E-mail</th>
+                    <th class="px-4 py-3">TOTP</th>
+                    <th class="px-4 py-3">Criado em</th>
+                    <th class="px-4 py-3 text-right">Ações</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% for u in usuarios %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-3">{{ u.email }}</td>
+                    <td class="px-4 py-3">
+                        {% if u.totp_ativo %}
+                            <span class="text-green-600 font-medium">Ativo</span>
+                        {% else %}
+                            <span class="text-gray-500">Inativo</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-4 py-3">{{ u.criado_em.strftime('%d/%m/%Y %H:%M') if u.criado_em else '-' }}</td>
+                    <td class="px-4 py-3 text-right">
+                        <a href="/admin/usuarios/{{ u.id }}/editar" class="text-blue-900 hover:underline mr-3">Alterar senha</a>
+                        {% if u.totp_ativo %}
+                        <form action="/admin/usuarios/{{ u.id }}/resetar-totp" method="post" class="inline mr-3">
+                            <button type="submit" class="text-orange-600 hover:underline" onclick="return confirm('Resetar TOTP deste usuário?')">Resetar TOTP</button>
+                        </form>
+                        {% endif %}
+                        {% if u.id != admin_atual.id %}
+                        <form action="/admin/usuarios/{{ u.id }}/excluir" method="post" class="inline">
+                            <button type="submit" class="text-red-600 hover:underline" onclick="return confirm('Excluir este usuário?')">Excluir</button>
+                        </form>
+                        {% else %}
+                            <span class="text-gray-400">Você</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
