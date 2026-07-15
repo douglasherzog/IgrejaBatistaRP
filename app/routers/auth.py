@@ -370,10 +370,12 @@ def dispositivos_page(
     if not usuario:
         raise HTTPException(status_code=404)
     dispositivos = db.query(DispositivoOtpExento).filter(DispositivoOtpExento.admin_id == id).order_by(DispositivoOtpExento.id.desc()).all()
+    meu_device_token = request.cookies.get("device_token")
     return templates.TemplateResponse("admin/usuarios/dispositivos.html", {
         "request": request,
         "usuario": usuario,
         "dispositivos": dispositivos,
+        "meu_device_token": meu_device_token,
     })
 
 
