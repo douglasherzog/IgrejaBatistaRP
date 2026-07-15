@@ -44,6 +44,11 @@ class AcessoLog(Base):
     detalhes = Column(Text, nullable=True)
     criado_em = Column(DateTime, server_default=func.now())
 
+    @property
+    def fingerprint(self):
+        import hashlib
+        return hashlib.sha256(f"{self.user_agent or ''}|{self.ip or ''}".encode()).hexdigest()
+
 
 class DispositivoOtpExento(Base):
     __tablename__ = "dispositivos_otp_exentos"
