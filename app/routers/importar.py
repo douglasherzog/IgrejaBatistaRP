@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Request, Form, HTTPException, UploadFile, File
 from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
+from app.templates import templates
 from sqlalchemy.orm import Session
 from datetime import datetime, date
 import pandas as pd
@@ -10,7 +10,6 @@ from app.models import Membro, Lancamento, TipoLancamento, Admin
 from app.auth import get_admin_atual
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
 
 
 @router.get("/admin/importar", response_class=HTMLResponse)

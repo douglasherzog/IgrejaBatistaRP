@@ -1,13 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, Form, Response
 from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
+from app.templates import templates
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import Admin, AcessoLog, DispositivoOtpExento, PermissaoAdmin
 from app import auth as auth_service
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
 
 AREAS_ADMIN = [
     ("dashboard", "Dashboard"),

@@ -2,7 +2,7 @@ import os
 import shutil
 from fastapi import APIRouter, Depends, Request, Form, HTTPException, UploadFile, File
 from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
+from app.templates import templates
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import Foto, Admin
@@ -10,7 +10,6 @@ from app.auth import get_admin_atual
 from app.routers.site import get_all_configs
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
 
 
 @router.get("/fotos", response_class=HTMLResponse)

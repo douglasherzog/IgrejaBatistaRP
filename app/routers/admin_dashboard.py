@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
+from app.templates import templates
 from sqlalchemy.orm import Session
 from sqlalchemy import extract
 from datetime import date
@@ -9,7 +9,6 @@ from app.models import Membro, Lancamento, TipoLancamento, Admin
 from app.auth import get_admin_atual
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
 
 
 @router.get("/admin/dashboard", response_class=HTMLResponse)

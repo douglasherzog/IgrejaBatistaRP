@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Request, Form, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
+from app.templates import templates
 from sqlalchemy.orm import Session
 from datetime import date
 from app.database import get_db
@@ -8,7 +8,6 @@ from app.models import Membro, Admin, Lancamento, TipoLancamento
 from app.auth import get_admin_atual
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
 
 
 @router.get("/admin/membros", response_class=HTMLResponse)

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Request, Form, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
+from app.templates import templates
 from sqlalchemy.orm import Session
 from sqlalchemy import func, extract
 from datetime import date
@@ -10,7 +10,6 @@ from app.models import Lancamento, TipoLancamento, Admin, Membro
 from app.auth import get_admin_atual
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
 
 CATEGORIAS_RECEITA = ["Dízimo", "Oferta", "Oferta Especial", "Doação", "Outros"]
 CATEGORIAS_DESPESA = ["Água/Luz/Gás", "Aluguel", "Manutenção", "Material", "Missões", "Salário", "Outros"]

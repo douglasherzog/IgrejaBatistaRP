@@ -2,7 +2,7 @@ import csv
 import io
 from fastapi import APIRouter, Depends, Request, Query
 from fastapi.responses import HTMLResponse, StreamingResponse
-from fastapi.templating import Jinja2Templates
+from app.templates import templates
 from sqlalchemy.orm import Session
 from sqlalchemy import extract, func
 from datetime import date
@@ -12,7 +12,6 @@ from app.models import Lancamento, TipoLancamento, Membro, Evento, InscricaoEven
 from app.auth import get_admin_atual
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
 
 MESES = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"]
 MESES_FULL = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",

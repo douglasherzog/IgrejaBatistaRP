@@ -1,7 +1,7 @@
 from typing import Optional
 from fastapi import APIRouter, Request, Depends, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
+from app.templates import templates
 from sqlalchemy.orm import Session
 from datetime import date
 from decimal import Decimal, InvalidOperation
@@ -12,7 +12,6 @@ from app.auth import get_admin_atual
 from app.security import csrf_valid
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
 
 
 @router.get("/", response_class=HTMLResponse)

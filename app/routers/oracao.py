@@ -1,7 +1,7 @@
 from typing import Optional
 from fastapi import APIRouter, Depends, Request, Form, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
-from fastapi.templating import Jinja2Templates
+from app.templates import templates
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import PedidoOracao, Admin
@@ -10,7 +10,6 @@ from app.routers.site import get_all_configs
 from app.security import csrf_valid
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
 
 
 @router.post("/pedidos-oracao")
