@@ -26,7 +26,7 @@
                 <tbody class="divide-y">
                     {% for c in contribuicoes %}
                     <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-3 whitespace-nowrap">{{ c.criado_em.strftime('%d/%m/%Y %H:%M') }}</td>
+                        <td class="px-4 py-3 whitespace-nowrap">{{ c.criado_em | sp_format('%d/%m/%Y %H:%M') }}</td>
                         <td class="px-4 py-3 font-medium">{{ c.nome }}</td>
                         <td class="px-4 py-3">
                             {% if c.email %}<div class="text-xs">{{ c.email }}</div>{% endif %}

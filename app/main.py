@@ -3,6 +3,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import PlainTextResponse
+from datetime import datetime, date, timezone
+from zoneinfo import ZoneInfo
 from app.database import engine, Base, SessionLocal
 from app.routers import publico, auth, membros, caixa, admin_dashboard, site, eventos, videos, oracao, inscricoes, fotos, relatorios, importar
 from app.routers.site import get_all_configs
@@ -62,10 +64,32 @@ class PermissionMiddleware(BaseHTTPMiddleware):
 app.add_middleware(PermissionMiddleware)
 
 
+TIMEZONE_SP = ZoneInfo("America/Sao_Paulo")
+
+def localtime(value):
+    if value is None:
+        return None
+    if isinstance(value, date) and not isinstance(value, datetime):
+        return value
+    if isinstance(value, datetime):
+        if value.tzinfo is None:
+            value = value.replace(tzinfo=timezone.utc)
+        return value.astimezone(TIMEZONE_SP)
+    return value
+
+
+def sp_format(value, format_str="%d/%m/%Y %H:%M"):
+    if value is None:
+        return ""
+    return localtime(value).strftime(format_str)
+
+
 # Filtro global Jinja2: disponibiliza cfg e helpers em todos os templates
 templates_instance = Jinja2Templates(directory="templates")
 templates_instance.env.globals["get_cfg"] = lambda request: getattr(request.state, "cfg", {})
 templates_instance.env.globals["get_csrf_token"] = get_csrf_token
+templates_instance.env.filters["localtime"] = localtime
+templates_instance.env.filters["sp_format"] = sp_format
 
 
 app.include_router(publico.router)

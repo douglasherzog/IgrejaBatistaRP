@@ -194,7 +194,7 @@
         {% if categoria %}<strong>Categoria:</strong> {{ categoria }}<br>{% endif %}
         {% if tipo %}<strong>Tipo:</strong> {{ tipo }}<br>{% endif %}
         {% if membro_filtrado %}<strong>Membro:</strong> {{ membro_filtrado.nome }} {{ membro_filtrado.sobrenome }}<br>{% endif %}
-        <strong>Emitido em:</strong> {{ hoje.strftime('%d/%m/%Y às %H:%M') }}
+        <strong>Emitido em:</strong> {{ hoje | sp_format('%d/%m/%Y às %H:%M') }}
     </div>
     
     <div class="totais">

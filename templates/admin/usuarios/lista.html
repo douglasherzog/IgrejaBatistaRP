@@ -43,7 +43,7 @@
                             <span class="text-gray-500">Inativo</span>
                         {% endif %}
                     </td>
-                    <td class="px-4 py-3">{{ u.criado_em.strftime('%d/%m/%Y %H:%M') if u.criado_em else '-' }}</td>
+                    <td class="px-4 py-3">{{ u.criado_em | sp_format('%d/%m/%Y %H:%M') if u.criado_em else '-' }}</td>
                     <td class="px-4 py-3 text-right">
                         {% if u.id != admin_atual.id %}
                         <a href="/admin/usuarios/{{ u.id }}/permissoes" class="text-blue-900 hover:underline mr-3">Permissões</a>

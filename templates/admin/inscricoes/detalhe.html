@@ -26,7 +26,7 @@
                 <td class="px-4 py-3 font-medium text-gray-800">{{ i.nome }}</td>
                 <td class="px-4 py-3 text-gray-600">{{ i.telefone or '—' }}</td>
                 <td class="px-4 py-3 text-gray-600">{{ i.email or '—' }}</td>
-                <td class="px-4 py-3 text-gray-400 text-xs">{{ i.criado_em.strftime('%d/%m/%Y') }}</td>
+                <td class="px-4 py-3 text-gray-400 text-xs">{{ i.criado_em | sp_format('%d/%m/%Y') }}</td>
                 <td class="px-4 py-3">
                     <form method="post" action="/admin/inscricoes/{{ i.id }}/excluir" onsubmit="return confirm('Remover esta inscrição?')">
                         <button type="submit" class="text-red-600 hover:text-red-800 text-xs">Remover</button>
