@@ -1,5 +1,8 @@
 import os
 import shutil
+import subprocess
+from pathlib import Path
+from PIL import Image
 from fastapi import APIRouter, Depends, Request, Form, HTTPException, UploadFile, File
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -245,7 +248,26 @@ async def upload_logo(
     dest = os.path.join(upload_dir, "logo" + ext)
     with open(dest, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
-    logo_url = f"/static/img/logo{ext}"
+
+    # Converte para PNG e regenera icones PWA
+    try:
+        img = Image.open(dest).convert("RGBA")
+        img.save(os.path.join(upload_dir, "logo.png"), "PNG")
+    except Exception:
+        pass
+    try:
+        project_root = Path(__file__).resolve().parents[2]
+        subprocess.run(
+            [str(project_root / "venv" / "Scripts" / "python.exe"), "gerar_icones.py"],
+            cwd=str(project_root),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            timeout=30
+        )
+    except Exception:
+        pass
+
+    logo_url = f"/static/img/logo.png"
     set_config(db, "logo_url", logo_url)
     db.commit()
     return RedirectResponse(url="/admin/site?ok=1#geral", status_code=302)
