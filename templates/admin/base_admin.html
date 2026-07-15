@@ -237,6 +237,9 @@
         <a href="/admin/usuarios" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-800 transition {% if '/admin/usuarios' in request.url.path %}bg-blue-800{% endif %}">
             <span>🔐</span> <span>Usuários</span>
         </a>
+        <a href="/admin/logs" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-800 transition {% if request.url.path == '/admin/logs' %}bg-blue-800{% endif %}">
+            <span>📋</span> <span>Logs</span>
+        </a>
         <a href="/admin/membros" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-800 transition {% if '/admin/membros' in request.url.path %}bg-blue-800{% endif %}">
             <span>👥</span> <span>Membros</span>
         </a>

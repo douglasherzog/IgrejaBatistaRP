@@ -1,0 +1,49 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Logs de Acesso{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <h1 class="text-2xl font-bold text-blue-900 mb-6">Logs de Acesso</h1>
+
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <table class="w-full text-sm text-left">
+            <thead class="bg-gray-100 text-gray-600 uppercase">
+                <tr>
+                    <th class="px-4 py-3">Data/Hora</th>
+                    <th class="px-4 py-3">E-mail</th>
+                    <th class="px-4 py-3">Ação</th>
+                    <th class="px-4 py-3">Path</th>
+                    <th class="px-4 py-3">IP</th>
+                    <th class="px-4 py-3">Detalhes</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% for log in logs %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-3 whitespace-nowrap">{{ log.criado_em.strftime('%d/%m/%Y %H:%M:%S') if log.criado_em else '-' }}</td>
+                    <td class="px-4 py-3">{{ log.email or '-' }}</td>
+                    <td class="px-4 py-3">
+                        <span class="px-2 py-1 rounded text-xs font-medium
+                            {% if log.acao in ('login_sucesso','totp_sucesso','logout') %}bg-green-100 text-green-800
+                            {% elif log.acao in ('login_falha','totp_falha','acesso_negado') %}bg-red-100 text-red-800
+                            {% else %}bg-gray-100 text-gray-800{% endif %}">
+                            {{ log.acao }}
+                        </span>
+                    </td>
+                    <td class="px-4 py-3">{{ log.path or '-' }}</td>
+                    <td class="px-4 py-3">{{ log.ip or '-' }}</td>
+                    <td class="px-4 py-3">{{ log.detalhes or '-' }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="px-4 py-6 text-center text-gray-500">
+                        Nenhum log registrado.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

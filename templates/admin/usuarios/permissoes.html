@@ -1,0 +1,40 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Permissões de {{ usuario.email }}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-blue-900">Permissões de {{ usuario.email }}</h1>
+        <a href="/admin/usuarios" class="text-gray-600 hover:text-gray-800">← Voltar</a>
+    </div>
+
+    {% if request.query_params.get('ok') %}
+        <div class="bg-green-100 text-green-800 px-4 py-3 rounded-lg mb-4">
+            Permissões atualizadas com sucesso.
+        </div>
+    {% endif %}
+
+    <div class="bg-white rounded-lg shadow p-6">
+        <form method="post" action="/admin/usuarios/{{ usuario.id }}/permissoes-salvar">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                {% for area, label in areas %}
+                <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 {% if area in ('usuarios','logs') %}opacity-50{% endif %}">
+                    <input type="checkbox" name="area_{{ area }}" value="1"
+                        {% if area in permissoes %}checked{% endif %}
+                        {% if area in ('usuarios','logs') %}disabled{% endif %}
+                        class="w-4 h-4 text-blue-900 rounded focus:ring-blue-900">
+                    <span class="ml-3 text-sm font-medium">{{ label }}</span>
+                </label>
+                {% endfor %}
+            </div>
+            <p class="text-xs text-gray-500 mb-6">* As áreas "Usuários Admin" e "Logs de Acesso" são exclusivas do administrador principal.</p>
+            <div class="text-right">
+                <button type="submit" class="bg-blue-900 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition">
+                    Salvar permissões
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

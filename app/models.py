@@ -18,7 +18,46 @@ class Admin(Base):
     senha_hash = Column(String(255), nullable=False)
     totp_secret = Column(String(64), nullable=True)
     totp_ativo = Column(Boolean, default=False)
+    is_superadmin = Column(Boolean, default=False)
     criado_em = Column(DateTime, server_default=func.now())
+
+
+class PermissaoAdmin(Base):
+    __tablename__ = "permissoes_admin"
+
+    id = Column(Integer, primary_key=True, index=True)
+    admin_id = Column(Integer, ForeignKey("admins.id"), nullable=False)
+    area = Column(String(50), nullable=False)
+    admin = relationship("Admin", backref="permissoes")
+
+
+class AcessoLog(Base):
+    __tablename__ = "acesso_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    admin_id = Column(Integer, ForeignKey("admins.id"), nullable=True)
+    email = Column(String(255), nullable=True)
+    acao = Column(String(50), nullable=False)
+    path = Column(String(255), nullable=True)
+    ip = Column(String(50), nullable=True)
+    user_agent = Column(String(500), nullable=True)
+    detalhes = Column(Text, nullable=True)
+    criado_em = Column(DateTime, server_default=func.now())
+
+
+class DispositivoOtpExento(Base):
+    __tablename__ = "dispositivos_otp_exentos"
+
+    id = Column(Integer, primary_key=True, index=True)
+    admin_id = Column(Integer, ForeignKey("admins.id"), nullable=False)
+    fingerprint = Column(String(128), nullable=False)
+    nome = Column(String(100), nullable=True)
+    ip = Column(String(50), nullable=True)
+    user_agent = Column(String(500), nullable=True)
+    ativo = Column(Boolean, default=True)
+    criado_em = Column(DateTime, server_default=func.now())
+
+    admin = relationship("Admin", backref="dispositivos_otp_exentos")
 
 
 class Membro(Base):

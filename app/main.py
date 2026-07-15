@@ -2,10 +2,13 @@ from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import PlainTextResponse
 from app.database import engine, Base, SessionLocal
 from app.routers import publico, auth, membros, caixa, admin_dashboard, site, eventos, videos, oracao, inscricoes, fotos, relatorios, importar
 from app.routers.site import get_all_configs
 from app.security import CSRFMiddleware, get_csrf_token
+from app.auth import verificar_token, area_do_path
+from app.models import Admin, PermissaoAdmin
 
 Base.metadata.create_all(bind=engine)
 
@@ -27,6 +30,36 @@ class ConfigSiteMiddleware(BaseHTTPMiddleware):
 
 
 app.add_middleware(ConfigSiteMiddleware)
+
+
+# Middleware: verifica permissões de acesso ao painel admin
+class PermissionMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        area = area_do_path(request.url.path)
+        if area:
+            token = request.cookies.get("session_token")
+            admin = None
+            if token:
+                payload = verificar_token(token)
+                if payload:
+                    db = SessionLocal()
+                    try:
+                        admin_id = int(payload.get("sub")) if payload.get("sub") else None
+                        admin = db.query(Admin).filter(Admin.id == admin_id).first()
+                    finally:
+                        db.close()
+            if admin and not admin.is_superadmin:
+                db = SessionLocal()
+                try:
+                    permissao = db.query(PermissaoAdmin).filter_by(admin_id=admin.id, area=area).first()
+                    if not permissao:
+                        return PlainTextResponse("Acesso negado", status_code=403)
+                finally:
+                    db.close()
+        return await call_next(request)
+
+
+app.add_middleware(PermissionMiddleware)
 
 
 # Filtro global Jinja2: disponibiliza cfg e helpers em todos os templates
